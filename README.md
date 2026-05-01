@@ -1,11 +1,9 @@
-<<<<<<< HEAD
-# taskflow
-=======
-# 🚀 TaskFlow API
+
+#  TaskFlow API
 
 A production-ready REST API with JWT authentication, role-based access control, and a modern light-themed frontend — built for the **Primetrade.ai Backend Intern Assignment**.
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer | Tech |
 |-------|------|
@@ -19,7 +17,7 @@ A production-ready REST API with JWT authentication, role-based access control, 
 | Logging | Winston |
 | Frontend | Vanilla JS + CSS (Clean Light Theme) |
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 backend_task/
@@ -44,7 +42,7 @@ backend_task/
         └── pages/app.js      # SPA logic with bright UI
 ```
 
-## ⚡ Quick Start
+## Quick Start
 
 ### 1. Install Dependencies
 ```bash
@@ -78,13 +76,13 @@ cd frontend
 npm run dev
 ```
 
-## 📚 Documentation
+## Documentation
 
 ### Postman Collection
 A full Postman collection is available for testing:
 Path: `docs/TaskFlow.postman_collection.json`
 
-## 📈 Scalability & Production Note
+## Scalability & Production Note
 
 For a production-scale deployment, this architecture can be scaled as follows:
 
@@ -94,7 +92,7 @@ For a production-scale deployment, this architecture can be scaled as follows:
 4.  **Load Balancing:** Use **NGINX** as a reverse proxy and load balancer to distribute traffic across multiple Node.js instances running in a **Docker Swarm** or **Kubernetes** cluster.
 5.  **Background Processing:** Use **BullMQ** or **Agenda** for heavy tasks like generating PDF reports or sending email notifications, keeping the main API thread responsive.
 
-## 🔐 Security Best Practices Implemented
+##  Security Best Practices Implemented
 - **Password Hashing:** Argon2/Bcrypt for secure storage.
 - **Role-Based Access (RBAC):** Granular control over endpoints.
 - **Dual-Token System:** Short-lived Access Tokens + long-lived Refresh Tokens.
@@ -102,7 +100,7 @@ For a production-scale deployment, this architecture can be scaled as follows:
 - **Helmet.js:** Sets secure HTTP headers.
 - **CORS:** Restricted origins for frontend security.
 
-## 🔌 API Reference
+##  API Reference
 
 ### Auth Endpoints — `/api/v1/auth`
 
@@ -134,7 +132,7 @@ For a production-scale deployment, this architecture can be scaled as follows:
 | PATCH | `/:id` | Admin | Update user role/status |
 | DELETE | `/:id` | Admin | Delete user |
 
-## 🔐 Authentication
+##  Authentication
 
 All protected routes require:
 ```
@@ -170,7 +168,7 @@ Access tokens expire in **7 days**. Refresh tokens in **30 days**. The frontend 
 // Virtual: isOverdue
 ```
 
-## 📈 Scalability Notes
+##  Scalability Notes
 
 1. **API Versioning** — All routes are prefixed `/api/v1/`. Adding v2 requires no breaking changes.
 2. **Modular Architecture** — Controllers, routes, validators, and models are fully separated. New modules (e.g., `notes`, `products`) follow the same pattern.
@@ -183,11 +181,10 @@ Access tokens expire in **7 days**. Refresh tokens in **30 days**. The frontend 
    - **Message queue** — Bull/BullMQ for background jobs (emails, reports)
    - **Microservices** — Auth service, Task service, and Notification service can be split when traffic grows
 
-## 🧪 Testing with Postman
+## Testing with Postman
 
 Import the collection from `docs/TaskFlow.postman_collection.json` or use the Swagger UI at `/api/docs`.
 
 ---
 
-Built with ❤️ for Primetrade.ai hiring assignment.
->>>>>>> 1e7d647 (Initial commit: TaskFlow API & Frontend)
+Built with efforts for Primetrade.ai hiring assignment.
