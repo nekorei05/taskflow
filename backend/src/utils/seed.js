@@ -14,37 +14,86 @@ const seed = async () => {
 
     // Create admin
     const admin = await User.create({
-      name: 'Admin User',
+      name: 'Vikram Singh',
       email: 'admin@test.com',
       password: 'Admin123',
       role: 'admin',
     });
 
     // Create regular users
-    const user1 = await User.create({ name: 'Alice Johnson', email: 'alice@test.com', password: 'Alice123', role: 'user' });
-    const user2 = await User.create({ name: 'Bob Smith', email: 'bob@test.com', password: 'Bob12345', role: 'user' });
+    const user1 = await User.create({ 
+      name: 'Arjun Mehta', 
+      email: 'arjun@test.com', 
+      password: 'Arjun123', 
+      role: 'user' 
+    });
+    
+    const user2 = await User.create({ 
+      name: 'Diya Sharma', 
+      email: 'diya@test.com', 
+      password: 'Diya123', 
+      role: 'user' 
+    });
 
     // Create tasks
     await Task.bulkCreate([
-      { title: 'Set up authentication system', description: 'Implement JWT auth with refresh tokens', status: 'completed', priority: 'high', ownerId: user1.id, tags: ['backend', 'auth'] },
-      { title: 'Design database schema', description: 'Create SQL schemas for users and tasks', status: 'completed', priority: 'high', ownerId: user1.id, tags: ['database'] },
-      { title: 'Build REST API endpoints', description: 'CRUD operations for tasks with role-based access', status: 'in-progress', priority: 'high', ownerId: user1.id, tags: ['backend', 'api'] },
-      { title: 'Write API documentation', description: 'Comprehensive Postman collection for all endpoints', status: 'pending', priority: 'medium', ownerId: user1.id, tags: ['docs'] },
-      { title: 'Create frontend UI', description: 'React frontend that connects to the API', status: 'in-progress', priority: 'medium', ownerId: user2.id, tags: ['frontend'] },
-      { title: 'Add input validation', description: 'Sanitize and validate all request inputs', status: 'completed', priority: 'high', ownerId: user2.id, tags: ['security'] },
-      { title: 'Implement rate limiting', description: 'Protect auth endpoints from brute force', status: 'completed', priority: 'medium', ownerId: admin.id, tags: ['security'] },
-      { title: 'Set up logging', description: 'Winston logger for errors and HTTP requests', status: 'completed', priority: 'low', ownerId: admin.id, tags: ['devops'] },
-      { title: 'Deploy to production', description: 'Docker containerization and cloud deploy', status: 'pending', priority: 'high', dueDate: new Date('2026-06-01'), ownerId: user2.id, tags: ['devops'] },
-      { title: 'Add Redis caching', description: 'Cache frequently accessed data', status: 'pending', priority: 'low', ownerId: admin.id, tags: ['performance'] },
+      { 
+        title: 'Complete Backend API', 
+        description: 'Finalize the JWT authentication and SQL integration', 
+        status: 'completed', 
+        priority: 'high', 
+        ownerId: user1.id, 
+        tags: ['backend', 'auth'] 
+      },
+      { 
+        title: 'Review TaskFlow Design', 
+        description: 'Check the new bright light theme for accessibility', 
+        status: 'completed', 
+        priority: 'medium', 
+        ownerId: user1.id, 
+        tags: ['frontend', 'design'] 
+      },
+      { 
+        title: 'Create Postman Collection', 
+        description: 'Document all v1 endpoints for the team', 
+        status: 'in-progress', 
+        priority: 'high', 
+        ownerId: user1.id, 
+        tags: ['docs'] 
+      },
+      { 
+        title: 'Test Indian Name Integration', 
+        description: 'Verify that the database stores localized names correctly', 
+        status: 'pending', 
+        priority: 'medium', 
+        ownerId: user2.id, 
+        tags: ['database'] 
+      },
+      { 
+        title: 'Security Audit', 
+        description: 'Check rate limits and Helmet configurations', 
+        status: 'completed', 
+        priority: 'high', 
+        ownerId: user2.id, 
+        tags: ['security'] 
+      },
+      { 
+        title: 'Deploy to Cloud', 
+        description: 'Set up Docker and NGINX for the production environment', 
+        status: 'pending', 
+        priority: 'high', 
+        ownerId: admin.id, 
+        tags: ['devops'] 
+      }
     ]);
 
     console.log('Seeded successfully!');
-    console.log('─────────────────────────────────────────');
-    console.log('Admin:  admin@test.com  / Admin123');
-    console.log('User 1: alice@test.com  / Alice123');
-    console.log('User 2: bob@test.com    / Bob12345');
-    console.log('─────────────────────────────────────────');
-
+    console.log('-----------------------------------------');
+    console.log('Admin:  admin@test.com  / Admin123 (Vikram Singh)');
+    console.log('User 1: arjun@test.com  / Arjun123 (Arjun Mehta)');
+    console.log('User 2: diya@test.com   / Diya123 (Diya Sharma)');
+    console.log('-----------------------------------------');
+    
     await sequelize.close();
     process.exit(0);
   } catch (error) {
