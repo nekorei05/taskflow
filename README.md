@@ -1,47 +1,33 @@
+<<<<<<< HEAD
 
 #  TaskFlow API
+=======
+# TaskFlow API
+>>>>>>> 7ee1e32 (updated readme and postman doc)
 
-A production-ready REST API with JWT authentication, role-based access control, and a modern light-themed frontend — built for the **Primetrade.ai Backend Intern Assignment**.
+A production-ready REST API with JWT authentication, role-based access control, and a modern light-themed frontend.
 
 ## Tech Stack
 
-| Layer | Tech |
-|-------|------|
-| Runtime | Node.js v22 |
-| Framework | Express.js |
-| **Database** | **SQLite + Sequelize (SQL)** |
-| Auth | JWT (Access + Refresh Tokens) |
-| Validation | express-validator |
-| Security | Helmet, CORS, Rate Limiting |
-| Docs | Swagger UI (OpenAPI 3.0) + Postman |
-| Logging | Winston |
-| Frontend | Vanilla JS + CSS (Clean Light Theme) |
+- Runtime: Node.js
+- Framework: Express.js
+- Database: SQLite + Sequelize
+- Auth: JWT (Access + Refresh Tokens)
+- Validation: express-validator
+- Security: Helmet, CORS, Rate Limiting
+- Frontend: Vanilla JS + CSS
 
+<<<<<<< HEAD
 ## Project Structure
+=======
+## Quick Start
+>>>>>>> 7ee1e32 (updated readme and postman doc)
 
-```
-backend_task/
-├── backend/
-│   ├── src/
-│   │   ├── config/        # DB connection, Swagger config
-│   │   ├── controllers/   # authController, taskController, userController
-│   │   ├── middleware/    # auth (protect/authorize), validate, errorHandler
-│   │   ├── models/        # User, Task (Sequelize models)
-│   │   ├── routes/v1/     # auth.routes, task.routes, user.routes
-│   │   ├── validators/    # express-validator rule sets
-│   │   ├── utils/         # logger (Winston), seed script
-│   │   ├── app.js         # Express app setup
-│   │   └── server.js      # Entry point
-│   ├── .env
-│   └── package.json
-└── frontend/
-    ├── index.html
-    └── src/
-        ├── styles/main.css
-        ├── services/api.js   # Fetch wrapper with auto token refresh
-        └── pages/app.js      # SPA logic with bright UI
-```
+1. Install Dependencies
+In the backend folder: npm install
+In the frontend folder: npm install
 
+<<<<<<< HEAD
 ## Quick Start
 
 ### 1. Install Dependencies
@@ -56,36 +42,45 @@ npm install
 ### 2. Seed Database
 This will create the SQLite file and populate test accounts.
 ```bash
+=======
+2. Seed Database
+This will create the database and test accounts.
+>>>>>>> 7ee1e32 (updated readme and postman doc)
 cd backend
 node src/utils/seed.js
-```
 
-**Test Accounts:**
-- `admin@test.com` / `Admin123` (Admin)
-- `alice@test.com` / `Alice123` (User)
-- `bob@test.com` / `Bob12345` (User)
+Test Accounts:
+- admin@test.com / Admin123 (Admin)
+- alice@test.com / Alice123 (User)
+- bob@test.com / Bob12345 (User)
 
-### 3. Start the Application
-```bash
-# Start Backend (Port 5002)
+3. Start the Application
+Start Backend (Port 5002):
 cd backend
 npm run dev
 
-# Start Frontend (Port 62321)
+Start Frontend (Port 62321):
 cd frontend
 npm run dev
-```
 
 ## Documentation
 
 ### Postman Collection
-A full Postman collection is available for testing:
-Path: `docs/TaskFlow.postman_collection.json`
+A full Postman collection is provided for testing.
+Path: docs/TaskFlow.postman_collection.json
 
+<<<<<<< HEAD
 ## Scalability & Production Note
+=======
+To use it:
+1. Open Postman.
+2. Click Import.
+3. Select the docs/TaskFlow.postman_collection.json file.
+>>>>>>> 7ee1e32 (updated readme and postman doc)
 
-For a production-scale deployment, this architecture can be scaled as follows:
+## Scalability Note
 
+<<<<<<< HEAD
 1.  **Database Migration:** Move from SQLite to a managed **PostgreSQL** or **MySQL** instance (e.g., AWS RDS). Sequelize makes this transition seamless by only changing the connection string.
 2.  **Caching:** Implement **Redis** to cache frequently accessed data (like user profiles or task counts) and to store the JWT blacklist for immediate token revocation.
 3.  **Microservices:** The Auth, Task, and User services can be separated into independent microservices communicating via **gRPC** or a message broker like **RabbitMQ** to handle high load independently.
@@ -188,3 +183,10 @@ Import the collection from `docs/TaskFlow.postman_collection.json` or use the Sw
 ---
 
 Built with efforts for Primetrade.ai hiring assignment.
+=======
+For production, this system can be scaled by:
+1. Database: Moving to PostgreSQL or MySQL.
+2. Caching: Adding Redis for user sessions.
+3. Infrastructure: Using NGINX as a load balancer and Docker for containerization.
+4. Services: Splitting into microservices if needed.
+>>>>>>> 7ee1e32 (updated readme and postman doc)
