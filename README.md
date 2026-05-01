@@ -10,7 +10,7 @@ A production‑ready REST API with JWT authentication, role‑based access contr
 - Auth: JWT (Access + Refresh Tokens)
 - Validation: express-validator
 - Security: Helmet, CORS, Rate Limiting
-- Frontend: Vanilla JS + CSS (original) **and** React (new conversion)
+- Frontend: React + Vite
 
 ## Quick Start
 
@@ -30,14 +30,7 @@ A production‑ready REST API with JWT authentication, role‑based access contr
    npm run dev
    ```
 
-4. **Run Frontend – Vanilla JS**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-
-5. **Run Frontend – React**
+4. **Run Frontend – React**
    ```bash
    cd frontend-react
    npm install
