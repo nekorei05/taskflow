@@ -20,12 +20,12 @@ A production‑ready REST API with JWT authentication, role‑based access contr
    npm install
    ```
 
-2. **Seed Database** (adds Indian names)
+2. **Seed Database** (adds names)
    ```bash
    node src/utils/seed.js
    ```
 
-3. **Run Backend** (port 5002)
+3. **Run Backend** 
    ```bash
    npm run dev
    ```
