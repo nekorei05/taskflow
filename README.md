@@ -64,7 +64,7 @@ Built with Node.js + Express on the backend and React + Vite on the frontend.
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -239,4 +239,4 @@ This project is architected to scale. Key decisions made for production-readines
 - RBAC enforced at the middleware level — not in controllers
 
 ---
-
+Built for Primetrade.ai hiring assignment.
