@@ -7,7 +7,7 @@
 <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white"/>
 <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"/>
 
-# ✅ TaskFlow
+#  TaskFlow
 
 **A full-stack task management app with JWT authentication and role-based access control.**
 
@@ -17,7 +17,7 @@ Built with Node.js + Express on the backend and React + Vite on the frontend.
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 | Admin Dashboard | User Dashboard |
 |---|---|
@@ -29,7 +29,7 @@ Built with Node.js + Express on the backend and React + Vite on the frontend.
 
 ---
 
-## 🚀 Features
+## Features
 
 **Authentication & Security**
 - JWT access tokens + refresh token rotation
@@ -40,11 +40,11 @@ Built with Node.js + Express on the backend and React + Vite on the frontend.
 - XSS sanitization
 
 **Role-Based Access Control**
-- `user` — can create, view, edit, and delete their own tasks only
-- `admin` — full access to all tasks, all users, and statistics dashboard
+- `user` — can create, view, edit and delete their own tasks only
+- `admin` — full access to all tasks, all users and statistics dashboard
 
 **Task Management**
-- Create tasks with title, description, status, priority, due date, and tags
+- Create tasks with title, description, status, priority, due date and tags
 - Filter by status (`pending`, `in-progress`, `completed`) and priority (`low`, `medium`, `high`)
 - Sort by newest, oldest, or due date
 - Paginated task list
@@ -74,44 +74,16 @@ Built with Node.js + Express on the backend and React + Vite on the frontend.
 | Auth | JWT (Access + Refresh Tokens) |
 | Validation | express-validator |
 | Security | Helmet, CORS, express-rate-limit, xss-clean |
-| Logging | Winston + Morgan |
 | Frontend | React 18 + Vite |
 | Charts | Recharts |
 | HTTP | Fetch API with auto token refresh |
 
 > **Why Node.js over Python?**  
-> Node.js was chosen for its non-blocking I/O model, making it better suited for a task management API that handles many concurrent requests. The Express ecosystem also has mature, battle-tested packages for JWT, validation, and security that integrate cleanly. The codebase follows MVC architecture with a clean separation of routes, controllers, models, validators, and middleware — the same patterns used in production Node.js services.
+> Node.js was chosen for its non-blocking I/O model, making it better suited for a task management API that handles many concurrent requests. The Express ecosystem also has mature, battle-tested packages for JWT, validation and security that integrate cleanly. The codebase follows MVC architecture with a clean separation of routes, controllers, models, validators and middleware — the same patterns used in production Node.js services.
 
 ---
 
-## 📁 Project Structure
-
-```
-taskflow/
-├── backend/
-│   ├── src/
-│   │   ├── config/         # DB connection, logger
-│   │   ├── controllers/    # Route handlers (auth, tasks, users)
-│   │   ├── middleware/     # Auth guard, error handler, validator
-│   │   ├── models/         # Sequelize models (User, Task)
-│   │   ├── routes/v1/      # Versioned API routes
-│   │   ├── validators/     # express-validator rule sets
-│   │   └── utils/          # Seed script, helpers
-│   └── server.js
-├── frontend/
-│   ├── src/
-│   │   ├── context/        # AuthContext (global user state)
-│   │   ├── services/       # API service class
-│   │   ├── components/     # TaskCard, TaskModal, Sidebar, etc.
-│   │   └── pages/          # AuthPage, Dashboard, Tasks, Admin, Stats
-│   └── index.html
-└── docs/
-    └── TaskFlow.postman_collection.json
-```
-
----
-
-## ⚡ Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+
@@ -166,7 +138,7 @@ node src/utils/seed.js
 ### 4. Run the App
 
 ```bash
-# Terminal 1 — Backend (http://localhost:5002)
+# Terminal 1 — Backend
 cd backend && npm run dev
 
 # Terminal 2 — Frontend (http://localhost:5173)
@@ -175,7 +147,7 @@ cd frontend && npm run dev
 
 ---
 
-## 📡 API Reference
+## API Reference
 
 Base URL: `http://localhost:5002/api/v1`
 
@@ -230,7 +202,7 @@ curl -X POST http://localhost:5002/api/v1/tasks \
 
 ---
 
-## 🧪 Testing with Postman
+## Testing with Postman
 
 A full Postman collection is included:
 
@@ -241,7 +213,7 @@ A full Postman collection is included:
 
 ---
 
-## 📈 Scalability
+## Scalability
 
 This project is architected to scale. Key decisions made for production-readiness:
 
@@ -257,7 +229,7 @@ This project is architected to scale. Key decisions made for production-readines
 
 ---
 
-## 🔐 Security Practices
+## Security Practices
 
 - Passwords hashed with bcrypt (12 salt rounds)
 - JWT access tokens expire in 15 minutes; refresh tokens rotated on each use
@@ -268,6 +240,3 @@ This project is architected to scale. Key decisions made for production-readines
 
 ---
 
-<div align="center">
-Made with ☕ and too many late nights
-</div>
