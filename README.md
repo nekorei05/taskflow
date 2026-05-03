@@ -1,6 +1,6 @@
 # TaskFlow API
 
-A production‑ready REST API with JWT authentication, role‑based access control, and a modern light‑themed frontend.
+A production‑ready REST API with JWT authentication, role‑based access control and a modern light‑themed frontend.
 
 ## Tech Stack
 
