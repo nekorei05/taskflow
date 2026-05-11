@@ -239,4 +239,3 @@ This project is architected to scale. Key decisions made for production-readines
 - RBAC enforced at the middleware level — not in controllers
 
 ---
-Built for Primetrade.ai hiring assignment.
