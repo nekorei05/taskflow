@@ -209,7 +209,7 @@ A full Postman collection is included:
 1. Open Postman
 2. Click **Import**
 3. Select `docs/TaskFlow.postman_collection.json`
-4. Use the Login request first — the collection auto-saves the token as an environment variable
+4. Use the Login request first : the collection auto-saves the token as an environment variable
 
 ---
 
