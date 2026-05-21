@@ -1,6 +1,6 @@
 <div align="center">
 
-# TaskFlow 
+ 
 <h1 align="center">
   <img src="./docs/screenshots/taskflow_logo.png" width="55" valign="middle"/>
   TaskFlow
