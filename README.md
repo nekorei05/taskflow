@@ -16,9 +16,12 @@ Manage projects, assign tasks, track workflows, and collaborate through a modern
 
 # Application Preview
 
-
 <p align="center">
-  <img src="./docs/screenshots/logo_taskflow.png" alt="TaskFlow Kanban Board" width="100"/>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/logo_taskflow.png">
+    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/logo_taskflow.png">
+    <img src="./docs/screenshots/logo_taskflow.png" alt="TaskFlow" width="140">
+  </picture>
 </p>
 
 <br/>
