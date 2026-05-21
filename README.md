@@ -1,12 +1,14 @@
 # TaskFlow — Collaborative Team Task Manager
 
-> Full-stack internship assignment — a real-world team task management platform built with the MERN stack.
+> Full-stack internship assignment - a real-world team task management platform built with the MERN stack.
 
-## Live Demo
+### Live Demo
 
-| | URL |
-|---|---|
-| https://taskflow-frontend-rosy-seven.vercel.app | 
+
+| Application | URL |
+| :--- | :--- |
+| TaskFlow Frontend | https://taskflow-frontend-rosy-seven.vercel.app |
+
 
 **Demo credentials**
 
