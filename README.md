@@ -16,16 +16,15 @@ Manage projects, assign tasks, track workflows, and collaborate through a modern
 
 # Application Preview
 
-> Add your screenshots inside an `assets/` folder in the root directory of the repository.
 
 <p align="center">
-  <img src="./assets/taskflow-kanban.png" alt="TaskFlow Kanban Board" width="1000"/>
+  <img src="./docs/screenshots/logo_taskflow.png" alt="TaskFlow Kanban Board" width="1000"/>
 </p>
 
 <br/>
 
 <p align="center">
-  <img src="./assets/taskflow-dashboard.png" alt="TaskFlow Dashboard" width="1000"/>
+  <img src="./docs/screenshots/taskflow.png" alt="TaskFlow Dashboard" width="1000"/>
 </p>
 
 ---
