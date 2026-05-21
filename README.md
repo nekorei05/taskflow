@@ -1,6 +1,11 @@
 <div align="center">
 
-# TaskFlow
+# TaskFlow 
+<h1 align="center">
+  <img src="./docs/screenshots/logo_taskflow.png" alt="TaskFlow Logo" width="45" style="vertical-align: middle; margin-right: 10px;" />
+  TaskFlow
+</h1>
+
 
 ### Collaborative Team Task Management
 
@@ -15,14 +20,6 @@ Manage projects, assign tasks, track workflows, and collaborate through a modern
 ---
 
 # Application Preview
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/screenshots/logo_taskflow.png">
-    <source media="(prefers-color-scheme: light)" srcset="./docs/screenshots/logo_taskflow.png">
-    <img src="./docs/screenshots/logo_taskflow.png" alt="TaskFlow" width="140">
-  </picture>
-</p>
 
 <br/>
 
