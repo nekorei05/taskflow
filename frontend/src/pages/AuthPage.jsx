@@ -30,41 +30,72 @@ function FlowLogo({ size = 36 }) {
 
 function MiniDashboard() {
   return (
-    <div style={{ marginTop: 24, background: 'rgba(255,255,255,0.15)', borderRadius: 16, padding: '14px' }}>
+    <div style={{ marginTop: 24 }}>
+      {/* Stat row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
         {[
-          { label: 'Completed', value: '24', color: '#4ade80' },
-          { label: 'In Progress', value: '8', color: '#fbbf24' },
-          { label: 'Overdue', value: '3', color: '#f87171' },
-          { label: 'Total Tasks', value: '35', color: '#a5b4fc' },
+          { label: 'Completed', value: '24', icon: '✓', iconColor: '#059669' },
+          { label: 'In Progress', value: '8',  icon: '↻', iconColor: '#d97706' },
+          { label: 'Overdue',     value: '3',  icon: '!', iconColor: '#dc2626' },
+          { label: 'Total',       value: '35', icon: '#', iconColor: '#475569' },
         ].map(stat => (
           <div key={stat.label} style={{
-            background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 12px',
+            background: 'rgba(255, 255, 255, 0.45)', 
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderRadius: 12, 
+            padding: '12px 14px',
+            border: '1px solid rgba(255, 255, 255, 0.4)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 12,
           }}>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>{stat.label}</div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: stat.color }}>{stat.value}</div>
+            <div style={{
+              width: 32, height: 32, borderRadius: 8,
+              background: 'rgba(255, 255, 255, 0.6)', // Milky task-matching background
+              border: '1px solid rgba(255, 255, 255, 0.8)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 14, color: stat.iconColor, fontWeight: 700, flexShrink: 0,
+            }}>{stat.icon}</div>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#0f1729', lineHeight: 1 }}>{stat.value}</div>
+              <div style={{ fontSize: 11, color: '#334155', marginTop: 3, fontWeight: 600 }}>{stat.label}</div>
+            </div>
           </div>
         ))}
       </div>
 
-      <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: 10, padding: '12px 14px' }}>
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', marginBottom: 10 }}>Task board</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+      {/* Kanban preview */}
+      <div style={{
+        background: 'rgba(255, 255, 255, 0.45)', 
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderRadius: 12,
+        padding: '16px', 
+        border: '1px solid rgba(255, 255, 255, 0.4)',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
+      }}>
+        <div style={{ fontSize: 11, fontWeight: 800, color: '#1e293b', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Task board</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
           {[
-            { col: 'To Do', color: '#94a3b8', tasks: ['Review designs', 'Write tests'] },
-            { col: 'In Progress', color: '#fbbf24', tasks: ['Build API'] },
-            { col: 'Done', color: '#4ade80', tasks: ['Auth flow', 'DB setup'] },
+            { col: 'To Do',       color: '#475569', tasks: ['Review designs', 'Write tests'] },
+            { col: 'In Progress', color: '#b45309', tasks: ['Build API'] }, 
+            { col: 'Done',        color: '#16a34a', tasks: ['Auth flow', 'DB setup'] },    
           ].map(col => (
             <div key={col.col}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: col.color }} />
-                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>{col.col}</span>
-              </div>
+              <div style={{
+                fontSize: 10, fontWeight: 700, color: col.color,
+                marginBottom: 8, paddingBottom: 6,
+                borderBottom: `1px solid rgba(0, 0, 0, 0.06)`,
+              }}>{col.col}</div>
               {col.tasks.map(t => (
                 <div key={t} style={{
-                  background: 'rgba(255,255,255,0.12)', borderRadius: 6,
-                  padding: '5px 7px', fontSize: 10, color: 'rgba(255,255,255,0.85)',
-                  marginBottom: 5, lineHeight: 1.3,
+                  background: 'rgba(255, 255, 255, 0.6)', 
+                  border: '1px solid rgba(255, 255, 255, 0.8)',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                  borderRadius: 6, padding: '6px 8px',
+                  fontSize: 10, color: '#1e293b', marginBottom: 6, lineHeight: 1.35, fontWeight: 600,
                 }}>{t}</div>
               ))}
             </div>
@@ -89,8 +120,9 @@ const s = {
     flex: 1, padding: '40px 52px', display: 'flex', flexDirection: 'column', justifyContent: 'center',
   },
   right: {
-    width: 440, background: '#3B6FF0', padding: '40px 36px',
+    width: 440, padding: '40px 36px',
     display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+    background: 'linear-gradient(145deg, #2d5be3 0%, #3B6FF0 50%, #4f7ff2 100%)',
   },
   brandRow: { display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 },
   brandName: { fontSize: 17, fontWeight: 600, color: '#0f1729', margin: 0 },
@@ -127,9 +159,9 @@ const s = {
     cursor: 'pointer', marginTop: 6, fontFamily: 'inherit',
   },
   demoCreds: { marginTop: 12, textAlign: 'center', fontSize: 12, color: '#9ca3af' },
-  rightHeading: { fontSize: 22, fontWeight: 700, color: '#fff', lineHeight: 1.35, margin: '0 0 8px' },
-  rightSub: { fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, margin: 0 },
-  rightFooter: { fontSize: 11, color: 'rgba(255,255,255,0.35)', paddingTop: 16 },
+  rightHeading: { fontSize: 24, fontWeight: 800, color: '#fff', lineHeight: 1.3, margin: '0 0 10px', letterSpacing: '-0.5px' },
+  rightSub: { fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.65, margin: 0 },
+  rightFooter: { fontSize: 11, color: 'rgba(255,255,255,0.3)', paddingTop: 16 },
 };
 
 export default function AuthPage() {

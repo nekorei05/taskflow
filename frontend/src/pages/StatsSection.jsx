@@ -9,7 +9,7 @@ import {
 
 const STATUS_COLORS = {
   pending: '#94a3b8',
-  'in-progress': '#d97706',
+  'in-progress': '#FFEA00',
   completed: '#059669',
 };
 

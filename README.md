@@ -1,278 +1,212 @@
 # TaskFlow — Collaborative Team Task Manager
 
-A modern full-stack collaborative task management platform inspired by tools like Trello and Asana.
-
-Built with the MERN stack, TaskFlow enables teams to create projects, assign tasks, manage workflows through Kanban boards, and track productivity with role-based access control and dashboard analytics.
-
----
+> Full-stack internship assignment — a real-world team task management platform built with the MERN stack.
 
 ## Live Demo
 
-Frontend: https://taskflow-frontend-rosy-seven.vercel.app
+| | URL |
+|---|---|
+| https://taskflow-frontend-rosy-seven.vercel.app | 
 
-Backend API: https://taskflow-api-e9jc.onrender.com
+**Demo credentials**
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@test.com | Admin123 |
+| Member | arjun@test.com | Arjun123 |
+
+---
+
+## Covers
+
+| Requirement | Status |
+|---|---|
+| JWT Authentication | ✅ |
+| Team Project Management | ✅ |
+| Task Assignment & CRUD | ✅ |
+| Dashboard Analytics | ✅ |
+| Role-Based Access Control | ✅ |
+| RESTful APIs | ✅ |
+| Database Relationships | ✅ |
+| Deployment (Frontend + Backend) | ✅ |
+| Environment Variables | ✅ |
+| Publicly Accessible App | ✅ |
 
 ---
 
 ## Features
 
 ### Authentication & Security
-
-* JWT Authentication
-* Refresh Token Rotation
-* Protected Routes
-* Role-Based Access Control (RBAC)
-* Password Hashing with bcrypt
-* Rate Limiting
-* Secure Environment Variables
+- JWT access tokens + refresh token rotation
+- Password hashing with bcrypt
+- Rate limiting & Helmet headers
+- Protected routes with RBAC
 
 ### Project Collaboration
-
-* Create collaborative projects
-* Project-scoped Admin & Member roles
-* Add/remove project members
-* Team-based task workflows
+- Create projects (creator becomes admin automatically)
+- Add / remove project members
+- Project-scoped Admin & Member roles
+- Team-based task workflows
 
 ### Task Management
-
-* Create and assign tasks
-* Priority & due date management
-* Status tracking:
-
-  * To Do
-  * In Progress
-  * Done
-* Drag-and-drop Kanban workflow
-* Overdue task highlighting
-* Task filtering & sorting
+- Create, assign, edit, and delete tasks
+- Priority levels: Low / Medium / High
+- Status tracking: To Do → In Progress → Done
+- Due dates with overdue highlighting
+- Drag-and-drop Kanban board
+- Filter & sort tasks
 
 ### Dashboard & Analytics
-
-* Tasks by status
-* Tasks per user
-* Project progress tracking
-* Overdue task analytics
-* Activity timeline feed
-
-### Activity Feed
-
-Track important project actions such as:
-
-* Task creation
-* Task assignment
-* Status updates
-* Project activity changes
+- Tasks by status (donut chart)
+- Tasks per user breakdown
+- Overdue task count
+- Project progress tracking
+- Activity timeline feed
 
 ---
 
-# Tech Stack
+## Tech Stack
 
-## Frontend
+### Frontend
+- React.js + Vite
+- React Router
+- Recharts (analytics)
+- CSS custom properties (theming)
 
-* React.js
-* Vite
-* React Router
-* Tailwind CSS
-* Recharts
+### Backend
+- Node.js + Express.js
+- MongoDB + Mongoose
+- JWT + bcrypt
+- express-rate-limit + Helmet
 
-## Backend
-
-* Node.js
-* Express.js
-* MongoDB
-* Mongoose
-
-## Authentication & Security
-
-* JWT
-* bcrypt
-* express-rate-limit
-* Helmet
-
-## Deployment
-
-* Frontend: Vercel
-* Backend: Render
-* Database: MongoDB Atlas
+### Deployment
+- **Frontend** → Vercel
+- **Backend** → Render
+- **Database** → MongoDB Atlas
 
 ---
 
-# Architecture
+##  Architecture
 
-The application follows a scalable MVC architecture:
-
-```bash
-backend/
- ├── controllers/
- ├── middleware/
- ├── models/
- ├── routes/
- ├── utils/
- └── services/
-
-frontend/
- ├── components/
- ├── pages/
- ├── context/
- ├── hooks/
- └── layouts/
+```
+taskflow/
+├── backend/
+│   ├── controllers/      # Route handlers
+│   ├── middleware/        # Auth, rate limiting, error handling
+│   ├── models/            # Mongoose schemas (User, Project, Task)
+│   ├── routes/            # API route definitions
+│   ├── utils/             # Helpers & token utilities
+│   └── services/          # Business logic
+│
+└── frontend/
+    ├── components/        # Reusable UI components
+    ├── pages/             # Route-level pages
+    ├── context/           # Auth & Project context
+    ├── hooks/             # Custom React hooks
+    └── layouts/           # App shell & sidebar
 ```
 
 ---
 
-# Role-Based Access
+## Role-Based Access
 
-## Admin
-
-* Manage projects
-* Add/remove members
-* Create and assign tasks
-* View project analytics
-
-## Member
-
-* View assigned projects
-* Update assigned tasks
-* Use Kanban workflow
-* Track project activity
+| Action | Admin | Member |
+|---|---|---|
+| Create project | ✅ | ❌ |
+| Add / remove members | ✅ | ❌ |
+| Create & assign tasks | ✅ | ❌ |
+| Update assigned tasks | ✅ | ✅ |
+| View Kanban board | ✅ | ✅ |
+| View dashboard analytics | ✅ | ✅ |
 
 ---
 
-# API Highlights
+## API Reference
 
-## Authentication
+### Auth
+```
+POST   /api/v1/auth/register
+POST   /api/v1/auth/login
+POST   /api/v1/auth/refresh
+```
 
-* POST `/api/v1/auth/register`
-* POST `/api/v1/auth/login`
-* POST `/api/v1/auth/refresh`
+### Projects
+```
+GET    /api/v1/projects
+POST   /api/v1/projects
+GET    /api/v1/projects/:id
+PATCH  /api/v1/projects/:id
+POST   /api/v1/projects/:id/members
+DELETE /api/v1/projects/:id/members/:userId
+```
 
-## Projects
-
-* GET `/api/v1/projects`
-* POST `/api/v1/projects`
-* PATCH `/api/v1/projects/:id`
-
-## Tasks
-
-* GET `/api/v1/tasks`
-* POST `/api/v1/tasks`
-* PATCH `/api/v1/tasks/:id`
+### Tasks
+```
+GET    /api/v1/tasks
+POST   /api/v1/tasks
+GET    /api/v1/tasks/:id
+PATCH  /api/v1/tasks/:id
+DELETE /api/v1/tasks/:id
+```
 
 ---
 
-# Local Setup
+## Local Setup
 
-## Clone Repository
+### Prerequisites
+- Node.js v18+
+- MongoDB Atlas account (or local MongoDB)
 
+### 1. Clone
 ```bash
 git clone https://github.com/nekorei05/taskflow.git
 cd taskflow
 ```
 
----
-
-## Backend Setup
-
+### 2. Backend
 ```bash
 cd backend
 npm install
 ```
 
-Create `.env`
-
+Create `backend/.env`:
 ```env
 MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
 JWT_REFRESH_SECRET=your_refresh_secret
 CLIENT_URL=http://localhost:5173
+PORT=5000
 ```
-
-Run backend:
 
 ```bash
 npm run dev
 ```
 
----
-
-## Frontend Setup
-
+### 3. Frontend
 ```bash
 cd frontend
 npm install
 ```
 
-Create `.env`
-
+Create `frontend/.env`:
 ```env
 VITE_API_URL=http://localhost:5000/api/v1
 ```
-
-Run frontend:
 
 ```bash
 npm run dev
 ```
 
----
-
-# Deployment
-
-## Frontend
-
-Deployed on Vercel.
-
-## Backend
-
-Deployed on Render.
-
-## Database
-
-Hosted on MongoDB Atlas.
+App runs at `http://localhost:5173`
 
 ---
 
-# Assignment Requirements Covered
+## Deployment
 
-* JWT Authentication
-* Team Project Management
-* Task Assignment
-* Dashboard Analytics
-* RBAC
-* REST APIs
-* Database Relationships
-* Deployment
-* Environment Variables
-* Publicly Accessible Full-Stack App
+| Layer | Platform | Notes |
+|---|---|---|
+| Frontend | Vercel | Auto-deploys from `main` branch |
+| Backend | Render | Web service, free tier |
+| Database | MongoDB Atlas | Free M0 cluster |
 
 ---
-
-# Future Improvements
-
-* Real-time collaboration
-* Notifications
-* File attachments
-* Comments on tasks
-* Calendar integration
-
----
-
-# Demo Credentials
-
-```txt
-Admin:
-admin@test.com
-Admin123
-
-Member:
-arjun@test.com
-Arjun123
-```
-
----
-
-# Author
-
-Rei Khandekar
-
-Built as a full-stack internship assignment project focused on collaborative workflow management and scalable backend architecture.

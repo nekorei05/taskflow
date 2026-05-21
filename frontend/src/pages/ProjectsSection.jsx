@@ -115,11 +115,17 @@ export default function ProjectsSection() {
           <button
             key={p._id}
             type="button"
-            className={`task-card ${activeProjectId === p._id ? 'in-progress' : 'pending'}`}
-            style={{ textAlign: 'left', cursor: 'pointer' }}
+className="task-card"
+style={{
+  textAlign: 'left', cursor: 'pointer',
+  boxShadow: 'none',
+  borderLeft: activeProjectId === p._id ? '3px solid #3d6ff0' : '3px solid transparent',
+  borderRadius: 12,
+  transition: 'border-color 0.15s',
+}}            style={{ textAlign: 'left', cursor: 'pointer' }}
             onClick={() => selectProject(p._id)}
           >
-            <h3 className="task-title">{p.name}</h3>
+<h3 className="task-title" style={{ color: '#3d6ff0' }}>{p.name}</h3>
             <p className="task-desc">{p.description || 'No description'}</p>
             <div className="task-meta">
               <span className="badge">{p.memberCount} members</span>
