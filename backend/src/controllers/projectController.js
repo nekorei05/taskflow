@@ -11,9 +11,17 @@ const getProjects = async (req, res, next) => {
       .sort({ updatedAt: -1 })
       .lean();
 
+    const projectIds = projects.map((p) => p._id);
+    const taskCounts = await Task.aggregate([
+      { $match: { projectId: { $in: projectIds } } },
+      { $group: { _id: '$projectId', count: { $sum: 1 } } },
+    ]);
+    const countMap = Object.fromEntries(taskCounts.map((c) => [String(c._id), c.count]));
+
     const data = projects.map((p) => ({
       ...p,
       memberCount: p.members.length,
+      taskCount: countMap[String(p._id)] || 0,
       myRole: p.members.find((m) => toIdString(m.userId) === toIdString(req.user._id))?.role,
     }));
 

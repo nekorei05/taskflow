@@ -7,6 +7,7 @@ const {
   assertProjectAdmin,
   assertAssigneeIsMember,
 } = require('../utils/projectAccess');
+const { canMemberUpdateTask, isTaskAssignee } = require('../utils/taskAccess');
 
 const populateTask = (query) =>
   query
@@ -56,7 +57,11 @@ const getTasks = async (req, res, next) => {
       filter.projectId = project._id;
     } else {
       const projectIds = await getMemberProjectIds(req.user._id);
-      filter.projectId = { $in: projectIds };
+      if (projectIds.length === 0) {
+        filter._id = { $in: [] };
+      } else {
+        filter.projectId = { $in: projectIds };
+      }
     }
 
     if (status) filter.status = status;
@@ -203,16 +208,6 @@ const createTask = async (req, res, next) => {
   }
 };
 
-const canMemberUpdateTask = (task, userId, body) => {
-  const memberAllowed = ['status', 'description'];
-  const keys = Object.keys(body).filter((k) => body[k] !== undefined);
-  return (
-    task.assignedTo &&
-    task.assignedTo.toString() === userId.toString() &&
-    keys.every((k) => memberAllowed.includes(k))
-  );
-};
-
 const updateTask = async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.id);
@@ -226,9 +221,12 @@ const updateTask = async (req, res, next) => {
     const isAdmin = project.isAdmin(req.user._id);
 
     if (!isAdmin && !canMemberUpdateTask(task, req.user._id, req.body)) {
+      const assigned = isTaskAssignee(task, req.user._id);
       return res.status(403).json({
         success: false,
-        message: 'Members can only update status/description on tasks assigned to them',
+        message: assigned
+          ? 'You can only change status and description on your assigned tasks'
+          : 'This task is not assigned to you. Ask a project admin to assign it.',
       });
     }
 

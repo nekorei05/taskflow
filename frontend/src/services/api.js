@@ -99,8 +99,11 @@ class ApiService {
 
   // Users (admin)
   getUsers = (params = {}) => {
-    const q = new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([, v]) => v)));
-    return this.request('GET', `/users?${q}`);
+    const q = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v !== '' && v != null))
+    );
+    const qs = q.toString();
+    return this.request('GET', `/users${qs ? `?${qs}` : ''}`);
   };
   updateUser = (id, body) => this.request('PATCH', `/users/${id}`, body);
   deleteUser = (id) => this.request('DELETE', `/users/${id}`);

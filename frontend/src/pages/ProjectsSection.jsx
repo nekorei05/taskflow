@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useProject } from '../context/ProjectContext';
+import RoleGuide from '../components/RoleGuide';
 import toast from 'react-hot-toast';
 
 export default function ProjectsSection() {
@@ -91,6 +92,8 @@ export default function ProjectsSection() {
           </p>
         </div>
       </header>
+
+      <RoleGuide context="projects" />
 
       <div className="filters-bar glass" style={{ marginBottom: 16 }}>
         <form onSubmit={handleCreate} className="form-row" style={{ width: '100%', gap: 12 }}>

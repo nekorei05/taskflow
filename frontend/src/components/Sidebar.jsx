@@ -34,7 +34,7 @@ const icons = {
 
 export default function Sidebar({ activeSection, onSectionChange }) {
   const { user, logout } = useAuth();
-  const { projects, activeProjectId, selectProject } = useProject();
+  const { projects, activeProjectId, activeProject, selectProject } = useProject();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -70,7 +70,9 @@ export default function Sidebar({ activeSection, onSectionChange }) {
             style={{ width: '100%', marginTop: 6 }}
           >
             {projects.map((p) => (
-              <option key={p._id} value={p._id}>{p.name}</option>
+              <option key={p._id} value={p._id}>
+                {p.name} ({p.taskCount ?? 0} tasks)
+              </option>
             ))}
           </select>
         </div>
@@ -94,7 +96,12 @@ export default function Sidebar({ activeSection, onSectionChange }) {
           <div className="avatar">{user?.name?.[0]?.toUpperCase()}</div>
           <div className="user-info">
             <p className="user-name">{user?.name}</p>
-            <span className={`role-badge ${user?.role === 'admin' ? 'admin' : ''}`}>{user?.role}</span>
+            {user?.role === 'admin' && (
+              <span className="role-badge admin">system admin</span>
+            )}
+            <span className={`role-badge ${activeProject?.myRole === 'admin' ? 'admin' : ''}`}>
+              {activeProject?.myRole ? `project ${activeProject.myRole}` : 'project —'}
+            </span>
           </div>
         </div>
         <button className="logout-btn" onClick={handleLogout} title="Logout">

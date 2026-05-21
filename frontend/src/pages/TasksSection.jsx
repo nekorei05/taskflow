@@ -2,19 +2,23 @@ import { useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useProject } from '../context/ProjectContext';
+import { sameUserId } from '../utils/ids';
 import TaskCard from '../components/TaskCard';
+import TaskListTable from '../components/TaskListTable';
 import TaskModal from '../components/TaskModal';
+import RoleGuide from '../components/RoleGuide';
 import ConfirmModal from '../components/ConfirmModal';
 import toast from 'react-hot-toast';
 
 export default function TasksSection() {
   const { user } = useAuth();
-  const { activeProjectId, isProjectAdmin, projects } = useProject();
+  const { activeProjectId, isProjectAdmin, projects, activeProject } = useProject();
   const [tasks, setTasks] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [view, setView] = useState('project');
+  const [display, setDisplay] = useState('table');
 
   const [filterStatus, setFilterStatus] = useState('');
   const [filterPriority, setFilterPriority] = useState('');
@@ -25,7 +29,8 @@ export default function TasksSection() {
   const [deleteId, setDeleteId] = useState(null);
 
   const loadTasks = useCallback(async () => {
-    if (view === 'project' && !activeProjectId) {
+    const needsProject = view === 'project' || view === 'overdue';
+    if (needsProject && !activeProjectId) {
       setTasks([]);
       setPagination(null);
       setLoading(false);
@@ -38,10 +43,9 @@ export default function TasksSection() {
         priority: filterPriority,
         sort: filterSort,
         page,
-        limit: 12,
+        limit: 50,
       };
-      if (view === 'project') params.projectId = activeProjectId;
-      if (view === 'assigned') params.assignedToMe = 'true';
+      if (needsProject) params.projectId = activeProjectId;
       if (view === 'overdue') params.overdue = 'true';
 
       const res =
@@ -60,6 +64,19 @@ export default function TasksSection() {
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
+
+  const canEditTask = (task) =>
+    isProjectAdmin || (task.assignedTo && sameUserId(task.assignedTo, user));
+
+  const handleQuickStatus = async (taskId, status) => {
+    try {
+      await api.updateTask(taskId, { status });
+      toast.success('Status updated');
+      loadTasks();
+    } catch (err) {
+      toast.error(err.message || 'Failed to update status');
+    }
+  };
 
   const handleEdit = (id) => {
     setEditingId(id);
@@ -98,10 +115,10 @@ export default function TasksSection() {
           <h2>Tasks</h2>
           <p className="subtitle">
             {view === 'assigned'
-              ? 'Assigned to you across projects'
+              ? 'Only tasks assigned to you'
               : view === 'overdue'
-                ? 'Overdue tasks in active project'
-                : projects.find((p) => p._id === activeProjectId)?.name || 'Select a project'}
+                ? 'Overdue in current project'
+                : `All tasks in ${activeProject?.name || 'project'} (including completed — visible to whole team)`}
           </p>
         </div>
         {canCreate && (
@@ -111,22 +128,31 @@ export default function TasksSection() {
         )}
       </header>
 
+      <RoleGuide context="tasks" />
+
       <div className="filters-bar glass">
         <div className="filter-group">
           <label>View</label>
           <select value={view} onChange={(e) => { setView(e.target.value); setPage(1); }}>
-            <option value="project">Project tasks</option>
+            <option value="project">All in project</option>
             <option value="assigned">Assigned to me</option>
             <option value="overdue">Overdue</option>
+          </select>
+        </div>
+        <div className="filter-group">
+          <label>Display</label>
+          <select value={display} onChange={(e) => setDisplay(e.target.value)}>
+            <option value="table">List</option>
+            <option value="cards">Cards</option>
           </select>
         </div>
         <div className="filter-group">
           <label>Status</label>
           <select value={filterStatus} onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }}>
             <option value="">All</option>
-            <option value="pending">Pending</option>
-            <option value="in-progress">In-Progress</option>
-            <option value="completed">Completed</option>
+            <option value="pending">To Do</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Done</option>
           </select>
         </div>
         <div className="filter-group">
@@ -150,6 +176,10 @@ export default function TasksSection() {
 
       {tasks.length > 0 && (
         <div className="task-stats-chips">
+          <span className="stat-chip">
+            <span className="stat-dot" />
+            {tasks.length} shown
+          </span>
           {Object.entries(statsCounts).map(([s, c]) => (
             <div key={s} className={`stat-chip ${s}`}>
               <span className="stat-dot" />
@@ -166,8 +196,12 @@ export default function TasksSection() {
           <h3>No tasks found</h3>
           <p>
             {view === 'project' && !activeProjectId
-              ? 'Join or create a project first'
-              : 'No tasks match your filters'}
+              ? 'Select a project in the sidebar'
+              : view === 'project' && activeProject
+                ? `No tasks in "${activeProject.name}" yet — try another project in the sidebar (counts shown there), or create one as project admin.`
+              : view === 'assigned'
+                ? 'Nothing assigned to you. Switch to "All in project" to see the full team board.'
+                : 'No tasks match your filters'}
           </p>
           {canCreate && (
             <button className="btn btn-primary" onClick={handleNewTask}>
@@ -175,6 +209,14 @@ export default function TasksSection() {
             </button>
           )}
         </div>
+      ) : display === 'table' ? (
+        <TaskListTable
+          tasks={tasks}
+          currentUser={user}
+          isProjectAdmin={isProjectAdmin}
+          onEdit={handleEdit}
+          onQuickStatus={handleQuickStatus}
+        />
       ) : (
         <div className="task-grid">
           {tasks.map((task) => (
@@ -182,13 +224,11 @@ export default function TasksSection() {
               key={task._id}
               task={task}
               currentUser={user}
-              canEdit={
-                isProjectAdmin ||
-                (task.assignedTo?._id === user._id || task.assignedTo === user._id)
-              }
+              canEdit={canEditTask(task)}
               canDelete={isProjectAdmin}
               onEdit={handleEdit}
               onDelete={setDeleteId}
+              onQuickStatus={canEditTask(task) ? handleQuickStatus : undefined}
             />
           ))}
         </div>
@@ -199,20 +239,9 @@ export default function TasksSection() {
           <button className="page-btn" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>
             ‹
           </button>
-          {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((i) => {
-            if (i === 1 || i === pagination.totalPages || Math.abs(i - page) <= 1)
-              return (
-                <button
-                  key={i}
-                  className={`page-btn ${i === page ? 'active' : ''}`}
-                  onClick={() => setPage(i)}
-                >
-                  {i}
-                </button>
-              );
-            if (Math.abs(i - page) === 2) return <span key={i} style={{ color: 'var(--text-3)' }}>…</span>;
-            return null;
-          })}
+          <span style={{ padding: '0 8px', fontSize: 13, color: 'var(--text-3)' }}>
+            Page {page} / {pagination.totalPages}
+          </span>
           <button
             className="page-btn"
             onClick={() => setPage((p) => p + 1)}

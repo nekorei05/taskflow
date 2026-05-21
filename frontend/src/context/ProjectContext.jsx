@@ -1,34 +1,44 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../services/api';
 import { useAuth } from './AuthContext';
 
 const ProjectContext = createContext(null);
 
+const idStr = (id) => (id == null ? '' : String(id));
+
 export function ProjectProvider({ children }) {
   const { user } = useAuth();
   const [projects, setProjects] = useState([]);
-  const [activeProjectId, setActiveProjectId] = useState(
-    () => localStorage.getItem('activeProjectId') || ''
-  );
+  const [activeProjectId, setActiveProjectId] = useState('');
   const [loading, setLoading] = useState(false);
+  const loadingRef = useRef(false);
+
+  const pickDefaultProject = (list) => {
+    if (!list.length) return '';
+    const stored = localStorage.getItem('activeProjectId');
+    const match = list.find((p) => idStr(p._id) === idStr(stored));
+    if (match) return idStr(match._id);
+    const withTasks = list.find((p) => p.taskCount > 0);
+    return idStr((withTasks || list[0])._id);
+  };
 
   const loadProjects = useCallback(async () => {
-    if (!user) return;
+    if (!user || loadingRef.current) return;
+    loadingRef.current = true;
     setLoading(true);
     try {
       const res = await api.getProjects();
       const list = res.data.projects || [];
       setProjects(list);
-      const stored = localStorage.getItem('activeProjectId');
-      if (list.length && !list.find((p) => p._id === stored)) {
-        const next = list[0]._id;
-        setActiveProjectId(next);
-        localStorage.setItem('activeProjectId', next);
-      }
+      const nextId = pickDefaultProject(list);
+      setActiveProjectId(nextId);
+      if (nextId) localStorage.setItem('activeProjectId', nextId);
+      else localStorage.removeItem('activeProjectId');
     } catch {
       setProjects([]);
     } finally {
       setLoading(false);
+      loadingRef.current = false;
     }
   }, [user]);
 
@@ -43,11 +53,12 @@ export function ProjectProvider({ children }) {
   }, [user, loadProjects]);
 
   const selectProject = (id) => {
-    setActiveProjectId(id);
-    localStorage.setItem('activeProjectId', id);
+    const sid = idStr(id);
+    setActiveProjectId(sid);
+    localStorage.setItem('activeProjectId', sid);
   };
 
-  const activeProject = projects.find((p) => p._id === activeProjectId) || null;
+  const activeProject = projects.find((p) => idStr(p._id) === idStr(activeProjectId)) || null;
   const isProjectAdmin = activeProject?.myRole === 'admin';
 
   return (

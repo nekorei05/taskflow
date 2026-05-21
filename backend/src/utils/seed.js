@@ -133,6 +133,20 @@ const seed = async () => {
       },
     ]);
 
+    // Repair legacy tasks missing projectId (so they show in the app)
+    const repaired = await Task.updateMany(
+      { $or: [{ projectId: null }, { projectId: { $exists: false } }] },
+      {
+        $set: {
+          projectId: productProject._id,
+          createdBy: admin._id,
+        },
+      }
+    );
+    if (repaired.modifiedCount > 0) {
+      console.log(`✓ Repaired ${repaired.modifiedCount} tasks missing projectId`);
+    }
+
     console.log('Seeded successfully!');
     console.log('-----------------------------------------');
     console.log('Admin:  admin@test.com  / Admin123 (Vikram Singh)');

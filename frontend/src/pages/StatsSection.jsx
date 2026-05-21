@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../services/api';
 import { useProject } from '../context/ProjectContext';
 import toast from 'react-hot-toast';
@@ -31,27 +31,46 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 export default function StatsSection() {
-  const { activeProjectId } = useProject();
+  const { activeProjectId, activeProject } = useProject();
   const [stats, setStats] = useState(null);
   const [userDash, setUserDash] = useState(null);
   const [projectDash, setProjectDash] = useState(null);
   const [loading, setLoading] = useState(true);
+  const lastToast = useRef(0);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
+
     const params = activeProjectId ? { projectId: activeProjectId } : {};
-    Promise.all([
+    const requests = [
       api.getTaskStats(params),
       api.getTaskDashboard(),
       activeProjectId ? api.getProjectDashboard(activeProjectId) : Promise.resolve(null),
-    ])
+    ];
+
+    Promise.all(requests)
       .then(([statsRes, dashRes, projRes]) => {
+        if (cancelled) return;
         setStats(statsRes.data);
         setUserDash(dashRes.data);
         setProjectDash(projRes?.data || null);
       })
-      .catch((err) => toast.error(err.message || 'Failed to load stats'))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (cancelled) return;
+        const now = Date.now();
+        if (now - lastToast.current > 3000) {
+          lastToast.current = now;
+          toast.error(err.message || 'Failed to load stats');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [activeProjectId]);
 
   if (loading) {
@@ -79,14 +98,18 @@ export default function StatsSection() {
       <header className="section-header">
         <div>
           <h2>Dashboard</h2>
-          <p className="subtitle">Project progress and personal workload</p>
+          <p className="subtitle">
+            {activeProject
+              ? `Stats for ${activeProject.name} (includes completed tasks)`
+              : 'Select a project in the sidebar'}
+          </p>
         </div>
       </header>
 
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-number">{total}</div>
-          <div className="stat-label">Total Tasks (scope)</div>
+          <div className="stat-label">Tasks in scope</div>
         </div>
         <div className="stat-card">
           <div className="stat-number" style={{ color: '#ef4444' }}>{stats?.overdueTasks ?? 0}</div>
@@ -96,14 +119,10 @@ export default function StatsSection() {
           <div className="stat-number">{userDash?.tasksAssignedToMe ?? 0}</div>
           <div className="stat-label">Assigned to me</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-number" style={{ color: '#ef4444' }}>{userDash?.overdueAssignedToMe ?? 0}</div>
-          <div className="stat-label">My overdue</div>
-        </div>
         {projectDash && (
           <div className="stat-card">
             <div className="stat-number">{projectDash.completionPercent}%</div>
-            <div className="stat-label">{projectDash.projectName} complete</div>
+            <div className="stat-label">{projectDash.projectName} done</div>
           </div>
         )}
       </div>
@@ -126,7 +145,7 @@ export default function StatsSection() {
         <div className="chart-card">
           <h3>Tasks by Status</h3>
           {statusData.length === 0 ? (
-            <p style={{ color: 'var(--text-3)', fontSize: 13 }}>No data yet</p>
+            <p style={{ color: 'var(--text-3)', fontSize: 13 }}>No tasks in this project yet</p>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
@@ -157,22 +176,6 @@ export default function StatsSection() {
               </BarChart>
             </ResponsiveContainer>
           )}
-        </div>
-
-        <div className="chart-card">
-          <h3>By Priority</h3>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={priorityData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis allowDecimals={false} />
-              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-                {priorityData.map((entry, i) => (
-                  <Cell key={i} fill={entry.fill} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
         </div>
       </div>
     </section>

@@ -45,15 +45,18 @@ export default function TaskModal({ taskId, projectId, isProjectAdmin, onClose, 
     e.preventDefault();
     setLoading(true);
     setError('');
-    const body = {
-      title,
-      description,
-      status,
-      priority,
-      dueDate: dueDate || undefined,
-      tags: tags ? tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
-    };
-    if (isProjectAdmin) {
+    const memberFieldsOnly = isEditing && !isProjectAdmin;
+    const body = memberFieldsOnly
+      ? { status, description }
+      : {
+          title,
+          description,
+          status,
+          priority,
+          dueDate: dueDate || undefined,
+          tags: tags ? tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
+        };
+    if (isProjectAdmin && !memberFieldsOnly) {
       body.assignedTo = assignedTo || null;
     }
     try {
@@ -82,6 +85,17 @@ export default function TaskModal({ taskId, projectId, isProjectAdmin, onClose, 
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal-card">
         <h2>{isEditing ? 'Edit Task' : 'New Task'}</h2>
+        {memberFieldsOnly && (
+          <p className="role-guide-hint" style={{ marginBottom: 12 }}>
+            As a project member you can update <strong>status</strong> and <strong>description</strong> on this
+            assigned task only.
+          </p>
+        )}
+        {isProjectAdmin && isEditing && (
+          <p className="role-guide-hint" style={{ marginBottom: 12 }}>
+            Project admin: you can edit all fields and reassign this task.
+          </p>
+        )}
         {fetching ? (
           <div className="loading-spinner"><div className="spinner" /><p>Loading...</p></div>
         ) : (

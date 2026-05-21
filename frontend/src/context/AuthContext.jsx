@@ -16,7 +16,10 @@ export function AuthProvider({ children }) {
       api._token = token;
       // Verify token is still valid
       api.getMe()
-        .then(res => { setUser(res.data.user); })
+        .then((res) => {
+          setUser(res.data.user);
+          localStorage.setItem('user', JSON.stringify(res.data.user));
+        })
         .catch(() => { logout(); })
         .finally(() => setLoading(false));
     } else {
