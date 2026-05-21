@@ -1,4 +1,5 @@
 import { sameUserId, userLabel } from '../utils/ids';
+import PriorityBadge from './PriorityBadge';
 
 const STATUS_LABELS = {
   pending: 'To Do',
@@ -47,7 +48,7 @@ export default function TaskCard({
 
       <div className="task-meta">
         <span className={`badge badge-status-${t.status}`}>{STATUS_LABELS[t.status] || t.status}</span>
-        <span className={`badge badge-priority-${t.priority}`}>{t.priority}</span>
+        <PriorityBadge priority={t.priority} />
         {isMine && <span className="badge badge-you">Assigned to you</span>}
         {!isMine && t.assignedTo && (
           <span className="task-owner">→ {userLabel(t.assignedTo)}</span>

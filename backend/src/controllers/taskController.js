@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Task = require('../models/Task');
 const Project = require('../models/Project');
 const User = require('../models/User');
@@ -476,11 +477,11 @@ const getTaskStats = async (req, res, next) => {
     const match = {};
 
     if (projectId) {
-      const { access } = await resolveProjectAccess(projectId, req.user._id);
+      const { project, access } = await resolveProjectAccess(projectId, req.user._id);
       if (!access.ok) {
         return res.status(access.status).json({ success: false, message: access.message });
       }
-      match.projectId = projectId;
+      match.projectId = project._id;
     } else if (req.user.role !== 'admin') {
       const projectIds = await getMemberProjectIds(req.user._id);
       match.projectId = { $in: projectIds };

@@ -73,18 +73,10 @@ export default function AdminSection() {
       <header className="section-header">
         <div>
           <h2>User Management</h2>
-          <p className="subtitle">
-            System admin — change global roles (separate from project admin on each project)
-          </p>
+          
         </div>
       </header>
 
-      <div className="role-guide glass">
-        <p className="role-guide-hint">
-          <strong>System admin</strong> (this page): manage all accounts.{' '}
-          <strong>Project admin</strong> (Projects page): manage members and tasks per project.
-        </p>
-      </div>
 
       <div className="filters-bar glass">
         <div className="filter-group">

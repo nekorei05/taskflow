@@ -1,6 +1,4 @@
-/**
- * Sync all tasks into projects with full fields. Run: npm run repair-tasks
- */
+
 require('dotenv').config();
 const { connectDB, disconnectDB } = require('../config/db');
 const Task = require('../models/Task');

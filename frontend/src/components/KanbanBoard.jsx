@@ -9,15 +9,19 @@ import {
 } from '@dnd-kit/core';
 import { useDroppable, useDraggable } from '@dnd-kit/core';
 import { userLabel } from '../utils/ids';
+import PriorityBadge from './PriorityBadge';
+import UserAvatar from './UserAvatar';
 
 const COLUMNS = [
-  { id: 'pending', title: 'To Do', status: 'pending' },
-  { id: 'in-progress', title: 'In Progress', status: 'in-progress' },
-  { id: 'completed', title: 'Done', status: 'completed' },
+  { id: 'pending', title: 'To Do', status: 'pending', colClass: 'kanban-column--pending' },
+  { id: 'in-progress', title: 'In Progress', status: 'in-progress', colClass: 'kanban-column--in-progress' },
+  { id: 'completed', title: 'Done', status: 'completed', colClass: 'kanban-column--completed' },
 ];
 
 function KanbanCard({ task, isDragging, onEdit }) {
   const overdue = task.isOverdue;
+  const assignee = userLabel(task.assignedTo);
+
   return (
     <div
       className={`kanban-card ${overdue ? 'overdue' : ''} ${isDragging ? 'dragging' : ''}`}
@@ -29,13 +33,23 @@ function KanbanCard({ task, isDragging, onEdit }) {
       <p className="kanban-card-title">{task.title}</p>
       {task.description && <p className="kanban-card-desc">{task.description}</p>}
       <div className="kanban-card-meta">
-        <span className={`badge badge-priority-${task.priority}`}>{task.priority}</span>
+        <PriorityBadge priority={task.priority} />
         {overdue && <span className="badge overdue-badge">Overdue</span>}
       </div>
-      <p className="kanban-card-assignee">{userLabel(task.assignedTo)}</p>
-      {task.dueDate && (
-        <p className="kanban-card-due">Due {new Date(task.dueDate).toLocaleDateString()}</p>
-      )}
+      <div className="kanban-card-footer">
+        <span className="kanban-assignee" title={assignee}>
+          <UserAvatar
+            name={assignee === 'Unassigned' ? null : assignee}
+            size="sm"
+          />
+          {assignee}
+        </span>
+        {task.dueDate && (
+          <span className={`kanban-card-due ${overdue ? 'overdue' : ''}`}>
+            {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -48,7 +62,7 @@ function DraggableTask({ task, canDrag, onEdit }) {
   });
 
   const style = transform
-    ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
+    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
     : undefined;
 
   return (
@@ -62,20 +76,32 @@ function KanbanColumn({ column, tasks, canDragTask, onEdit }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
   return (
-    <div ref={setNodeRef} className={`kanban-column ${isOver ? 'droppable-over' : ''}`}>
+    <div
+      ref={setNodeRef}
+      className={`kanban-column ${column.colClass} ${isOver ? 'droppable-over' : ''}`}
+    >
       <header className="kanban-column-header">
-        <h3>{column.title}</h3>
+        <div className="kanban-column-title">
+          <span className="kanban-status-dot" />
+          <h3>{column.title}</h3>
+        </div>
         <span className="kanban-count">{tasks.length}</span>
       </header>
       <div className="kanban-column-body">
-        {tasks.map((task) => (
-          <DraggableTask
-            key={task._id}
-            task={task}
-            canDrag={canDragTask(task)}
-            onEdit={onEdit}
-          />
-        ))}
+        {tasks.length === 0 ? (
+          <p className="label-hint" style={{ padding: '12px 4px', textAlign: 'center' }}>
+            Drop tasks here
+          </p>
+        ) : (
+          tasks.map((task) => (
+            <DraggableTask
+              key={task._id}
+              task={task}
+              canDrag={canDragTask(task)}
+              onEdit={onEdit}
+            />
+          ))
+        )}
       </div>
     </div>
   );
@@ -85,7 +111,7 @@ export default function KanbanBoard({ tasks, canDragTask, onStatusChange, onEdit
   const [activeTask, setActiveTask] = useState(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   );
 
   const tasksByStatus = (status) => tasks.filter((t) => t.status === status);
@@ -128,7 +154,7 @@ export default function KanbanBoard({ tasks, canDragTask, onStatusChange, onEdit
           />
         ))}
       </div>
-      <DragOverlay>
+      <DragOverlay dropAnimation={{ duration: 180 }}>
         {activeTask ? <KanbanCard task={activeTask} isDragging onEdit={() => {}} /> : null}
       </DragOverlay>
     </DndContext>

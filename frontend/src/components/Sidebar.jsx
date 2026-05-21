@@ -2,6 +2,8 @@ import { useAuth } from '../context/AuthContext';
 import { useProject } from '../context/ProjectContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import TaskFlowLogo from './TaskFlowLogo';
+import UserAvatar from './UserAvatar';
 
 const icons = {
   projects: (
@@ -52,14 +54,15 @@ export default function Sidebar({ activeSection, onSectionChange }) {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-header">
-        <div className="logo-icon-sm">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </div>
+      <button
+        type="button"
+        className="sidebar-brand"
+        onClick={() => onSectionChange('tasks')}
+        title="Go to Tasks"
+      >
+        <TaskFlowLogo size={34} />
         <span className="logo-text">TaskFlow</span>
-      </div>
+      </button>
 
       {projects.length > 0 && (
         <div className="filters-bar glass" style={{ margin: '0 12px 12px', padding: 10 }}>
@@ -93,7 +96,7 @@ export default function Sidebar({ activeSection, onSectionChange }) {
 
       <div className="sidebar-footer">
         <div className="user-profile">
-          <div className="avatar">{user?.name?.[0]?.toUpperCase()}</div>
+          <UserAvatar name={user?.name} size="md" />
           <div className="user-info">
             <p className="user-name">{user?.name}</p>
             {user?.role === 'admin' && (

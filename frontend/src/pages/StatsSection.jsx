@@ -3,181 +3,256 @@ import { api } from '../services/api';
 import { useProject } from '../context/ProjectContext';
 import toast from 'react-hot-toast';
 import {
-  PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
 
 const STATUS_COLORS = {
-  pending: '#ef4444',
-  'in-progress': '#f59e0b',
-  completed: '#10b981',
+  pending: '#94a3b8',
+  'in-progress': '#d97706',
+  completed: '#059669',
 };
 
-const PRIORITY_COLORS = {
-  high: '#ff0000',
-  medium: '#f59e0b',
-  low: '#10b981',
+const STATUS_LABELS = {
+  pending: 'To Do',
+  'in-progress': 'In Progress',
+  completed: 'Done',
 };
 
-const CustomTooltip = ({ active, payload }) => {
-  if (active && payload?.length) {
-    return (
-      <div style={{ background: 'white', border: '1.5px solid #bbd5da', borderRadius: 10, padding: '10px 14px', fontSize: 13, fontWeight: 700 }}>
-        {payload[0].name}: {payload[0].value}
-      </div>
-    );
-  }
-  return null;
+const WORKFLOW_ORDER = ['pending', 'in-progress', 'completed'];
+
+const DashTooltip = ({ active, payload }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="dash-tooltip">
+      {payload[0].payload?.name || payload[0].name}: <strong>{payload[0].value}</strong>
+    </div>
+  );
 };
+
+function countByStatus(breakdown, status) {
+  return breakdown?.find((s) => s._id === status)?.count || 0;
+}
 
 export default function StatsSection() {
   const { activeProjectId, activeProject } = useProject();
-  const [stats, setStats] = useState(null);
-  const [userDash, setUserDash] = useState(null);
   const [projectDash, setProjectDash] = useState(null);
   const [loading, setLoading] = useState(true);
   const lastToast = useRef(0);
 
   useEffect(() => {
+    if (!activeProjectId) {
+      setProjectDash(null);
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
     setLoading(true);
 
-    const params = activeProjectId ? { projectId: activeProjectId } : {};
-    const requests = [
-      api.getTaskStats(params),
-      api.getTaskDashboard(),
-      activeProjectId ? api.getProjectDashboard(activeProjectId) : Promise.resolve(null),
-    ];
-
-    Promise.all(requests)
-      .then(([statsRes, dashRes, projRes]) => {
-        if (cancelled) return;
-        setStats(statsRes.data);
-        setUserDash(dashRes.data);
-        setProjectDash(projRes?.data || null);
+    api
+      .getProjectDashboard(activeProjectId)
+      .then((res) => {
+        if (!cancelled) setProjectDash(res.data);
       })
       .catch((err) => {
-        if (cancelled) return;
-        const now = Date.now();
-        if (now - lastToast.current > 3000) {
-          lastToast.current = now;
-          toast.error(err.message || 'Failed to load stats');
+        if (!cancelled) {
+          const now = Date.now();
+          if (now - lastToast.current > 3000) {
+            lastToast.current = now;
+            toast.error(err.message || 'Failed to load dashboard');
+          }
         }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [activeProjectId]);
 
-  if (loading) {
-    return <div className="loading-spinner"><div className="spinner" /><p>Loading stats...</p></div>;
+  if (!activeProjectId) {
+    return (
+      <section className="content-section dash-page">
+        <header className="section-header">
+          <div>
+            <h2>Dashboard</h2>
+            <p className="subtitle">Select a project in the sidebar to see its overview</p>
+          </div>
+        </header>
+        <div className="dash-empty glass">
+          <p>Choose <strong>TaskFlow Product</strong> or another project from the dropdown on the left.</p>
+        </div>
+      </section>
+    );
   }
 
-  const total = stats?.statusBreakdown?.reduce((a, s) => a + s.count, 0) || 0;
-  const statusData = (stats?.statusBreakdown || []).map((s) => ({
-    name: s._id,
-    value: s.count,
-    fill: STATUS_COLORS[s._id] || '#94a3b8',
-  }));
-  const priorityData = (stats?.priorityBreakdown || []).map((p) => ({
-    name: p._id,
-    value: p.count,
-    fill: PRIORITY_COLORS[p._id] || '#94a3b8',
-  }));
-  const perUserData = (stats?.tasksPerUser || []).map((u) => ({
-    name: u.name,
-    value: u.count,
+  if (loading) {
+    return (
+      <div className="loading-spinner">
+        <div className="spinner" />
+        <p>Loading dashboard…</p>
+      </div>
+    );
+  }
+
+  const breakdown = projectDash?.statusBreakdown || [];
+  const total = projectDash?.totalTasks ?? 0;
+  const completed = countByStatus(breakdown, 'completed');
+  const inProgress = countByStatus(breakdown, 'in-progress');
+  const todo = countByStatus(breakdown, 'pending');
+  const incomplete = total - completed;
+  const overdue = projectDash?.overdueTasks ?? 0;
+
+  const statusData = WORKFLOW_ORDER.map((key) => ({
+    key,
+    name: STATUS_LABELS[key],
+    value: countByStatus(breakdown, key),
+    fill: STATUS_COLORS[key],
+  })).filter((d) => d.value > 0);
+
+  const workflowData = WORKFLOW_ORDER.map((key) => ({
+    name: STATUS_LABELS[key],
+    value: countByStatus(breakdown, key),
+    fill: STATUS_COLORS[key],
   }));
 
+  const perUser = projectDash?.tasksPerUser || [];
+
   return (
-    <section className="content-section">
-      <header className="section-header">
+    <section className="content-section dash-page">
+      <header className="section-header dash-header-simple">
         <div>
           <h2>Dashboard</h2>
           <p className="subtitle">
-            {activeProject
-              ? `Stats for ${activeProject.name} (includes completed tasks)`
-              : 'Select a project in the sidebar'}
+            {activeProject?.name}
           </p>
         </div>
       </header>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-number">{total}</div>
-          <div className="stat-label">Tasks in scope</div>
+      {/* Row 1 — KPI cards like Asana */}
+      <div className="dash-kpi-row">
+        <div className="dash-kpi-card">
+          <span className="dash-kpi-label">Completed tasks</span>
+          <span className="dash-kpi-value">{completed}</span>
+          <span className="dash-kpi-foot">Done</span>
         </div>
-        <div className="stat-card">
-          <div className="stat-number" style={{ color: '#ef4444' }}>{stats?.overdueTasks ?? 0}</div>
-          <div className="stat-label">Overdue</div>
+        <div className="dash-kpi-card">
+          <span className="dash-kpi-label">Incomplete tasks</span>
+          <span className="dash-kpi-value">{incomplete}</span>
+          <span className="dash-kpi-foot">To do + in progress</span>
         </div>
-        <div className="stat-card">
-          <div className="stat-number">{userDash?.tasksAssignedToMe ?? 0}</div>
-          <div className="stat-label">Assigned to me</div>
+        <div className="dash-kpi-card dash-kpi-card--alert">
+          <span className="dash-kpi-label">Overdue tasks</span>
+          <span className="dash-kpi-value dash-kpi-value--danger">{overdue}</span>
+          <span className="dash-kpi-foot">Past due date</span>
         </div>
-        {projectDash && (
-          <div className="stat-card">
-            <div className="stat-number">{projectDash.completionPercent}%</div>
-            <div className="stat-label">{projectDash.projectName} done</div>
-          </div>
-        )}
+        <div className="dash-kpi-card">
+          <span className="dash-kpi-label">Total tasks</span>
+          <span className="dash-kpi-value">{total}</span>
+          <span className="dash-kpi-foot">In this project</span>
+        </div>
       </div>
 
-      {userDash?.tasksPerProject?.length > 0 && (
-        <div className="chart-card" style={{ marginBottom: 16 }}>
-          <h3>Tasks per project</h3>
-          <div className="stats-grid">
-            {userDash.tasksPerProject.map((p) => (
-              <div key={p.projectId} className="stat-card">
-                <div className="stat-number">{p.completionPercent}%</div>
-                <div className="stat-label">{p.name} ({p.completed}/{p.total})</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="charts-row">
-        <div className="chart-card">
-          <h3>Tasks by Status</h3>
-          {statusData.length === 0 ? (
-            <p style={{ color: 'var(--text-3)', fontSize: 13 }}>No tasks in this project yet</p>
+      {/* Row 2 — two charts */}
+      <div className="dash-charts-row">
+        <div className="dash-chart-panel">
+          <h3 className="dash-chart-title">Task status breakdown</h3>
+          {total === 0 ? (
+            <p className="chart-card-empty">No tasks in this project yet</p>
           ) : (
-            <ResponsiveContainer width="100%" height={260}>
-              <PieChart>
-                <Pie data={statusData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={3} dataKey="value">
-                  {statusData.map((entry, i) => (
-                    <Cell key={i} fill={entry.fill} stroke="white" strokeWidth={2} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+            <div className="dash-donut-layout">
+              <div className="dash-donut-chart">
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={statusData.length ? statusData : [{ name: 'Empty', value: 1, fill: '#e2e8f0' }]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={52}
+                      outerRadius={76}
+                      paddingAngle={2}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {(statusData.length ? statusData : [{ fill: '#e2e8f0' }]).map((entry, i) => (
+                        <Cell key={i} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<DashTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="dash-donut-center">
+                  <span className="dash-donut-total">{total}</span>
+                  <span className="dash-donut-sub">tasks</span>
+                </div>
+              </div>
+              <ul className="dash-legend">
+                {WORKFLOW_ORDER.map((key) => (
+                  <li key={key}>
+                    <span className="dash-legend-dot" style={{ background: STATUS_COLORS[key] }} />
+                    {STATUS_LABELS[key]} ({countByStatus(breakdown, key)})
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
 
-        <div className="chart-card">
-          <h3>Tasks per assignee</h3>
-          {perUserData.length === 0 ? (
-            <p style={{ color: 'var(--text-3)', fontSize: 13 }}>No assigned tasks</p>
+        <div className="dash-chart-panel">
+          <h3 className="dash-chart-title">Work status</h3>
+          {total === 0 ? (
+            <p className="chart-card-empty">No tasks to chart</p>
           ) : (
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={perUserData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#dff1f1" />
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#0d9488" radius={[6, 6, 0, 0]} />
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={workflowData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 11, fill: '#64748b' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={{ fontSize: 11, fill: '#94a3b8' }}
+                  axisLine={false}
+                  tickLine={false}
+                  label={{
+                    value: 'Task count',
+                    angle: -90,
+                    position: 'insideLeft',
+                    style: { fontSize: 11, fill: '#94a3b8' },
+                  }}
+                />
+                <Tooltip content={<DashTooltip />} />
+                <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={48}>
+                  {workflowData.map((entry, i) => (
+                    <Cell key={i} fill={entry.fill} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           )}
         </div>
       </div>
+
+      {/* Row 3 — assignees (simple list) */}
+      {perUser.length > 0 && (
+        <div className="dash-chart-panel dash-assignee-panel">
+          <h3 className="dash-chart-title">Tasks per teammate</h3>
+          <div className="dash-assignee-grid">
+            {perUser.map((u) => (
+              <div key={u.userId} className="dash-assignee-item">
+                <span className="dash-assignee-name">{u.name}</span>
+                <span className="dash-assignee-count">
+                  {u.total} assigned · {u.completed} done
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

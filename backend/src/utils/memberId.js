@@ -1,4 +1,3 @@
-/** Normalize userId whether it's an ObjectId, populated User doc, or string */
 const toIdString = (id) => {
   if (!id) return '';
   if (typeof id === 'string') return id;

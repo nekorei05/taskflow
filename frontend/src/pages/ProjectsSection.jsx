@@ -86,36 +86,28 @@ export default function ProjectsSection() {
         <div>
           <h2>Projects</h2>
           <p className="subtitle">
-            Create a team space, then add people who already signed up. No emails are sent.
+            Create a team space then add people who already signed up.
           </p>
         </div>
       </header>
-
-      <div className="role-guide glass role-guide-compact">
-        <p className="role-guide-lines">
-          Project admins invite members and manage the board. Members work on tasks assigned to them.
-        </p>
-      </div>
 
       <div className="filters-bar glass" style={{ marginBottom: 16 }}>
         <form onSubmit={handleCreate} className="form-row" style={{ width: '100%', gap: 12 }}>
           <div className="form-group" style={{ flex: 1 }}>
             <label>New project name</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Sprint Alpha" required />
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Jira Project" required />
           </div>
           <div className="form-group" style={{ flex: 2 }}>
             <label>Description</label>
             <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional" />
           </div>
-          <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-end' }}>
-            + Create
+          <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-end', width: 'fit-content', whiteSpace: 'nowrap' }}>            + Create
           </button>
         </form>
       </div>
 
-      <p className="subtitle" style={{ marginBottom: 12, fontSize: 13 }}>
-        Demo accounts to invite: <strong>arjun@test.com</strong>, <strong>diya@test.com</strong>,{' '}
-        <strong>admin@test.com</strong> (passwords in seed / README)
+      <p style={{ marginBottom: 12, fontSize: 12, color: 'var(--color-text-secondary)' }}>
+        Demo users: arjun@test.com · diya@test.com · admin@test.com
       </p>
 
       <div className="task-grid">
@@ -141,69 +133,105 @@ export default function ProjectsSection() {
 
       {activeProjectId && (
         <div className="chart-card" style={{ marginTop: 24 }}>
-          <h3>Members — {projectDetail?.name || '...'}</h3>
+          <h3 style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 15, fontWeight: 500, margin: '0 0 16px' }}>
+            <span style={{ color: 'var(--color-text-secondary)', fontWeight: 400, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.07em' }}>Members —</span>
+            <span style={{ color: 'var(--color-text-primary)', fontWeight: 600, fontSize: 16 }}>{projectDetail?.name || '...'}</span>
+          </h3>
           {loadingDetail ? (
             <div className="loading-spinner"><div className="spinner" /></div>
           ) : (
             <>
               <ul style={{ listStyle: 'none', padding: 0, margin: '12px 0' }}>
-                {(projectDetail?.members || []).map((m) => (
-                  <li
-                    key={m.userId?._id || m.userId}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '8px 0',
-                      borderBottom: '1px solid var(--border)',
-                    }}
-                  >
-                    <span>
-                      {m.userId?.name || 'User'} — {m.userId?.email} ({m.role})
-                    </span>
-                    {isAdminOnDetail && toId(m.userId) !== toId(projectDetail?.createdBy) && (
-                      <button
-                        type="button"
-                        className="btn btn-ghost"
-                        onClick={() => handleRemove(toId(m.userId))}
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </li>
-                ))}
+                {(projectDetail?.members || []).map((m) => {
+                  const isAdmin = m.role === 'admin';
+                  const nameStr = m.userId?.name || 'User';
+                  const initials = nameStr.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                  return (
+                    <li
+                      key={m.userId?._id || m.userId}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: '10px 0',
+                        borderBottom: '0.5px solid var(--color-border-tertiary)',
+                      }}
+                    >
+                      <div style={{
+                        width: 34, height: 34, borderRadius: '50%', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                        fontSize: 12, fontWeight: 600, flexShrink: 0,
+                        background: '#e8eeff',
+                        color: '#4a6fd4',
+                      }}>
+                        {initials}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: 'var(--color-text-primary)' }}>{nameStr}</p>
+                        <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-secondary)' }}>{m.userId?.email}</p>
+                      </div>
+                      <span style={{
+                        fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 99,
+                        background: isAdmin ? '#EEEDFE' : '#E1F5EE',
+                        color: isAdmin ? '#3C3489' : '#085041',
+                      }}>
+                        {m.role}
+                      </span>
+                      {isAdminOnDetail && toId(m.userId) !== toId(projectDetail?.createdBy) && (
+                        <button
+                          type="button"
+                          className="btn btn-ghost"
+                          style={{ fontSize: 12, padding: '4px 10px', whiteSpace: 'nowrap' }}
+                          onClick={() => handleRemove(toId(m.userId))}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
               {isAdminOnDetail && (
-                <form onSubmit={handleInvite} className="form-row">
-                  <div className="form-group" style={{ flex: 1 }}>
-                    <label>Add existing user</label>
-                    <select
-                      value={selectedUserId}
-                      onChange={(e) => setSelectedUserId(e.target.value)}
-                      required
-                    >
-                      <option value="">Select a user…</option>
-                      {candidates.map((u) => (
-                        <option key={u._id} value={u._id}>
-                          {u.name} ({u.email})
-                        </option>
-                      ))}
-                    </select>
-                    {candidates.length === 0 && (
-                      <p className="label-hint" style={{ marginTop: 6 }}>
-                        Everyone with an account is already on this project, or sign up another user first.
-                      </p>
-                    )}
-                  </div>
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    style={{ alignSelf: 'flex-end' }}
-                    disabled={!selectedUserId}
-                  >
-                    Add member
-                  </button>
-                </form>
+             <form onSubmit={handleInvite} className="form-row" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+             {/* Row Container */}
+             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
+               
+               {/* Removed flex: 1 so it stays compact */}
+               <div className="form-group" style={{ marginBottom: 0 }}>
+                 <label>Add existing user</label>
+                 <select
+                   value={selectedUserId}
+                   onChange={(e) => setSelectedUserId(e.target.value)}
+                   required
+                 >
+                   <option value="">Select a user…</option>
+                   {candidates.map((u) => (
+                     <option key={u._id} value={u._id}>
+                       {u.name} ({u.email})
+                     </option>
+                   ))}
+                 </select>
+               </div>
+           
+               <button
+                 type="submit"
+                 className="btn btn-primary"
+                 style={{ whiteSpace: 'nowrap', height: '42px' }}
+                 disabled={!selectedUserId}
+               >
+                 Add member
+               </button>
+             </div>
+           
+             {/* Hint text */}
+             {candidates.length === 0 && (
+               <p className="label-hint" style={{ marginTop: 4, fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+                 Everyone with an account is already on this project or sign up another user first.
+               </p>
+             )}
+           </form>
+           
+              
               )}
               {!isAdminOnDetail && projectDetail && (
                 <p className="subtitle">Only project admins can add or remove members.</p>

@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema(
     refreshToken: {
       type: String,
       default: null,
-      select: false, // Don't return refresh token by default
+      select: false, 
     },
     isActive: {
       type: Boolean,
@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt
+    timestamps: true, 
   }
 );
 
@@ -67,12 +67,10 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-// Add method to compare passwords
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Add method to hide sensitive fields in responses
 userSchema.methods.toJSON = function () {
   const userObject = this.toObject();
   delete userObject.password;

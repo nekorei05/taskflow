@@ -21,8 +21,15 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public Authentication Screen */}
           <Route path="/" element={<PublicRoute><AuthPage /></PublicRoute>} />
+          
+          {/* Authenticated Application Page Routes */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/tasks" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/projects" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          
+          {/* Wildcard Fallback redirection */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

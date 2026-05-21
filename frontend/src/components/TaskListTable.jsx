@@ -1,4 +1,5 @@
 import { sameUserId, userLabel } from '../utils/ids';
+import PriorityBadge from './PriorityBadge';
 
 const STATUS_LABELS = {
   pending: 'To Do',
@@ -49,7 +50,7 @@ export default function TaskListTable({
                   </span>
                 </td>
                 <td>
-                  <span className={`badge badge-priority-${t.priority}`}>{t.priority}</span>
+                  <PriorityBadge priority={t.priority} />
                 </td>
                 <td>{userLabel(t.assignedTo)}</td>
                 <td>{t.dueDate ? new Date(t.dueDate).toLocaleDateString() : '—'}</td>

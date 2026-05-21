@@ -11,7 +11,6 @@ const logActivity = async ({ projectId, taskId, actorId, type, message, meta = {
       meta,
     });
   } catch (err) {
-    // Non-blocking — never fail the main request
     console.error('Activity log failed:', err.message);
   }
 };

@@ -26,7 +26,7 @@ app.use(
   })
 );
 
-// Rate limiting — relaxed in development (Strict Mode + dashboards caused 429s)
+// Rate limiting
 const isDev = process.env.NODE_ENV !== 'production';
 const globalLimiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,

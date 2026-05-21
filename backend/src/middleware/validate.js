@@ -1,6 +1,5 @@
 const { validationResult } = require('express-validator');
 
-//Middleware: Run express-validator checks and return 422 on failure
 
 const validate = (req, res, next) => {
   const errors = validationResult(req);
