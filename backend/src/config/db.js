@@ -1,21 +1,53 @@
-const { Sequelize } = require('sequelize');
-const path = require('path');
+require('dotenv').config();
+const mongoose = require('mongoose');
 const logger = require('../utils/logger');
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: path.join(__dirname, '../../../database.sqlite'),
-  logging: (msg) => logger.debug(msg),
-});
+// Serverless-safe connection caching for Vercel
+let cachedConnection = null;
 
 const connectDB = async () => {
+  if (cachedConnection) {
+    logger.info('✓ Using cached MongoDB connection');
+    return cachedConnection;
+  }
+
   try {
-    await sequelize.authenticate();
-    logger.info('SQLite database connected');
+    const mongoUri = process.env.MONGODB_URI;
+    
+    if (!mongoUri) {
+      throw new Error('MONGODB_URI environment variable is not set');
+    }
+
+    const connection = await mongoose.connect(mongoUri, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      family: 4, // Force IPv4 (prevents IPv6 issues)
+    });
+
+    cachedConnection = connection;
+    
+    const dbName = connection.connection.db.databaseName;
+    logger.info(`✓ MongoDB database connected: ${dbName}`);
+    
+    return connection;
   } catch (error) {
-    logger.error(`Database connection error: ${error.message}`);
+    logger.error(`✗ Database connection error: ${error.message}`);
+    console.error('Stack trace:', error.stack);
     process.exit(1);
   }
 };
 
-module.exports = { sequelize, connectDB };
+const disconnectDB = async () => {
+  try {
+    if (cachedConnection) {
+      await mongoose.disconnect();
+      cachedConnection = null;
+      logger.info('✓ MongoDB disconnected');
+    }
+  } catch (error) {
+    logger.error(`Error disconnecting from MongoDB: ${error.message}`);
+  }
+};
+
+module.exports = { connectDB, disconnectDB, mongoose };

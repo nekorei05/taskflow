@@ -1,0 +1,44 @@
+{
+  "development": {
+    "username": "taskflow_user",
+    "password": "your_secure_password",
+    "database": "taskflow_dev",
+    "host": "localhost",
+    "port": 5432,
+    "dialect": "postgres",
+    "logging": true,
+    "seederStorage": "sequelize",
+    "seederStorageTableName": "SequelizeData"
+  },
+  "staging": {
+    "username": "taskflow_user",
+    "password": "your_staging_password",
+    "database": "taskflow_staging",
+    "host": "staging-db.internal",
+    "port": 5432,
+    "dialect": "postgres",
+    "logging": false,
+    "pool": {
+      "max": 5,
+      "min": 1,
+      "acquire": 30000,
+      "idle": 10000
+    }
+  },
+  "production": {
+    "use_env_variable": "DATABASE_URL",
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl": {
+        "rejectUnauthorized": false
+      }
+    },
+    "logging": false,
+    "pool": {
+      "max": 5,
+      "min": 1,
+      "acquire": 30000,
+      "idle": 10000
+    }
+  }
+}

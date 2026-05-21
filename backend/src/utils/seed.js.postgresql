@@ -1,0 +1,106 @@
+require('dotenv').config();
+const { sequelize } = require('../config/db');
+const User = require('../models/User');
+const Task = require('../models/Task');
+
+const seed = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('✓ Connected to PostgreSQL');
+
+    // Sync models (creates tables if needed)
+    await sequelize.sync({ alter: process.env.NODE_ENV === 'development' });
+    console.log('✓ Database schema synchronized');
+
+    // Clear existing data (development only)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Clearing existing data...');
+      await Task.destroy({ where: {}, truncate: true, cascade: true });
+      await User.destroy({ where: {}, truncate: true, cascade: true });
+      console.log('✓ Existing data cleared');
+    }
+
+    // Create admin user
+    const admin = await User.create({
+      name: 'Vikram Singh',
+      email: 'admin@test.com',
+      password: 'Admin123',
+      role: 'admin',
+    });
+    console.log('✓ Admin user created');
+
+    // Create regular users
+    const user1 = await User.create({
+      name: 'Arjun Mehta',
+      email: 'arjun@test.com',
+      password: 'Arjun123',
+      role: 'user',
+    });
+
+    const user2 = await User.create({
+      name: 'Diya Sharma',
+      email: 'diya@test.com',
+      password: 'Diya123',
+      role: 'user',
+    });
+    console.log('✓ Regular users created');
+
+    // Create sample tasks
+    const tasks = await Task.bulkCreate([
+      {
+        title: 'Complete Backend API',
+        description: 'Finalize the JWT authentication and PostgreSQL integration',
+        status: 'completed',
+        priority: 'high',
+        ownerId: user1.id,
+        tags: ['backend', 'auth'],
+      },
+      {
+        title: 'Review Database Schema',
+        description: 'Check PostgreSQL schema for optimization and indexing',
+        status: 'in-progress',
+        priority: 'high',
+        ownerId: user1.id,
+        tags: ['database', 'optimization'],
+      },
+      {
+        title: 'Fix UI Bug',
+        description: 'Modal validation issue in React components',
+        status: 'pending',
+        priority: 'medium',
+        ownerId: user2.id,
+        tags: ['frontend', 'bug-fix'],
+      },
+      {
+        title: 'Setup CI/CD Pipeline',
+        description: 'Configure GitHub Actions for automated testing and deployment',
+        status: 'pending',
+        priority: 'medium',
+        ownerId: user1.id,
+        tags: ['devops', 'automation'],
+      },
+      {
+        title: 'Implement caching layer',
+        description: 'Add Redis for token validation and session management',
+        status: 'pending',
+        priority: 'low',
+        ownerId: user2.id,
+        tags: ['performance', 'backend'],
+      },
+    ]);
+    console.log(`✓ ${tasks.length} sample tasks created`);
+
+    console.log('\n✅ Database seeding completed successfully!');
+    console.log('\nTest Accounts:');
+    console.log('├─ admin@test.com / Admin123 (Admin)');
+    console.log('├─ arjun@test.com / Arjun123 (User)');
+    console.log('└─ diya@test.com / Diya123 (User)');
+
+    await sequelize.close();
+  } catch (error) {
+    console.error('❌ Seeding failed:', error.message);
+    process.exit(1);
+  }
+};
+
+seed();

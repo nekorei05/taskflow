@@ -13,3 +13,10 @@ database.sqlite
 # OS
 .DS_Store
 Thumbs.db
+
+
+#custom
+Team_Task_Manager_Assignment.docx
+VERCEL_SUPABASE_DEPLOYMENT.md
+backend/.env.example.postgresql
+backend/package.json.postgresql

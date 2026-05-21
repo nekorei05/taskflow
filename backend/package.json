@@ -18,9 +18,8 @@
     "express-validator": "^7.1.0",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.0",
     "morgan": "^1.10.0",
-    "sequelize": "^6.37.8",
-    "sqlite3": "^6.0.1",
     "winston": "^3.13.0",
     "xss-clean": "^0.1.4"
   },

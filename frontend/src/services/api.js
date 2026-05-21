@@ -1,4 +1,4 @@
-const API_BASE = 'http://127.0.0.1:5002/api/v1';
+const API_BASE = 'http://localhost:5000/api/v1';
 
 class ApiService {
   _token = null;
@@ -72,7 +72,30 @@ class ApiService {
   createTask = (body) => this.request('POST', '/tasks', body);
   updateTask = (id, body) => this.request('PATCH', `/tasks/${id}`, body);
   deleteTask = (id) => this.request('DELETE', `/tasks/${id}`);
-  getTaskStats = () => this.request('GET', '/tasks/stats');
+  getTaskStats = (params = {}) => {
+    const q = new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([, v]) => v)));
+    const qs = q.toString();
+    return this.request('GET', `/tasks/stats${qs ? `?${qs}` : ''}`);
+  };
+  getTaskDashboard = () => this.request('GET', '/tasks/dashboard');
+  getAssignedTasks = (params = {}) => {
+    const q = new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([, v]) => v)));
+    return this.request('GET', `/tasks/assigned/me?${q}`);
+  };
+  assignTask = (id, body) => this.request('PATCH', `/tasks/${id}/assign`, body);
+
+  // Projects
+  getProjects = () => this.request('GET', '/projects');
+  getProject = (id) => this.request('GET', `/projects/${id}`);
+  createProject = (body) => this.request('POST', '/projects', body);
+  updateProject = (id, body) => this.request('PATCH', `/projects/${id}`, body);
+  deleteProject = (id) => this.request('DELETE', `/projects/${id}`);
+  getProjectDashboard = (id) => this.request('GET', `/projects/${id}/dashboard`);
+  getInviteCandidates = (id) => this.request('GET', `/projects/${id}/invite-candidates`);
+  inviteProjectMember = (id, body) => this.request('POST', `/projects/${id}/members`, body);
+  removeProjectMember = (id, userId) => this.request('DELETE', `/projects/${id}/members/${userId}`);
+  updateProjectMemberRole = (id, userId, body) =>
+    this.request('PATCH', `/projects/${id}/members/${userId}`, body);
 
   // Users (admin)
   getUsers = (params = {}) => {

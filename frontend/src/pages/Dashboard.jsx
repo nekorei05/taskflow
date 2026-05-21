@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { ProjectProvider } from '../context/ProjectContext';
 import { Navigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import TasksSection from './TasksSection';
+import ProjectsSection from './ProjectsSection';
 import AdminSection from './AdminSection';
 import StatsSection from './StatsSection';
 
@@ -14,19 +16,21 @@ export default function Dashboard() {
   if (!user) return <Navigate to="/" replace />;
 
   const handleSectionChange = (s) => {
-    // If non-admin tries to access admin sections, redirect to tasks
-    if ((s === 'admin' || s === 'stats') && user.role !== 'admin') return;
+    if ((s === 'admin') && user.role !== 'admin') return;
     setSection(s);
   };
 
   return (
-    <div className="dashboard-container">
-      <Sidebar activeSection={section} onSectionChange={handleSectionChange} />
-      <main className="content-area">
-        {section === 'tasks' && <TasksSection />}
-        {section === 'admin' && user.role === 'admin' && <AdminSection />}
-        {section === 'stats' && user.role === 'admin' && <StatsSection />}
-      </main>
-    </div>
+    <ProjectProvider>
+      <div className="dashboard-container">
+        <Sidebar activeSection={section} onSectionChange={handleSectionChange} />
+        <main className="content-area">
+          {section === 'tasks' && <TasksSection />}
+          {section === 'projects' && <ProjectsSection />}
+          {section === 'stats' && <StatsSection />}
+          {section === 'admin' && user.role === 'admin' && <AdminSection />}
+        </main>
+      </div>
+    </ProjectProvider>
   );
 }

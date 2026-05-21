@@ -4,10 +4,10 @@ const logger = require('../utils/logger');
 
 const generateTokens = (userId) => {
   const accessToken = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    expiresIn: process.env.JWT_EXPIRES_IN || '15m',
   });
   const refreshToken = jwt.sign({ id: userId }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
+    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   });
   return { accessToken, refreshToken };
 };
@@ -17,13 +17,13 @@ const register = async (req, res, next) => {
     const { name, email, password, role } = req.body;
     const assignedRole = role === 'admin' ? 'user' : (role || 'user');
 
-    const existingUser = await User.findOne({ where: { email } });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ success: false, message: 'An account with this email already exists' });
     }
 
     const user = await User.create({ name, email, password, role: assignedRole });
-    const { accessToken, refreshToken } = generateTokens(user.id);
+    const { accessToken, refreshToken } = generateTokens(user._id);
 
     user.refreshToken = refreshToken;
     user.lastLogin = new Date();
@@ -32,7 +32,6 @@ const register = async (req, res, next) => {
     logger.info(`New user registered: ${email}`);
 
     const userData = user.toJSON();
-    userData._id = userData.id;
 
     res.status(201).json({ success: true, message: 'Account created successfully', data: { user: userData, accessToken, refreshToken } });
   } catch (err) { next(err); }
@@ -42,7 +41,7 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ email }).select('+password');
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
@@ -51,13 +50,12 @@ const login = async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Account is deactivated' });
     }
 
-    const { accessToken, refreshToken } = generateTokens(user.id);
+    const { accessToken, refreshToken } = generateTokens(user._id);
     user.refreshToken = refreshToken;
     user.lastLogin = new Date();
     await user.save();
 
     const userData = user.toJSON();
-    userData._id = userData.id;
 
     logger.info(`User logged in: ${email}`);
     res.status(200).json({ success: true, message: 'Logged in successfully', data: { user: userData, accessToken, refreshToken } });
@@ -73,12 +71,12 @@ const refresh = async (req, res, next) => {
     try { decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET); }
     catch { return res.status(401).json({ success: false, message: 'Invalid or expired refresh token' }); }
 
-    const user = await User.findByPk(decoded.id);
+    const user = await User.findById(decoded.id).select('+refreshToken');
     if (!user || user.refreshToken !== refreshToken) {
       return res.status(401).json({ success: false, message: 'Token mismatch' });
     }
 
-    const tokens = generateTokens(user.id);
+    const tokens = generateTokens(user._id);
     user.refreshToken = tokens.refreshToken;
     await user.save();
 
@@ -88,7 +86,9 @@ const refresh = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
-    await User.update({ refreshToken: null }, { where: { id: req.user.id } });
+    const user = await User.findById(req.user._id);
+    user.refreshToken = null;
+    await user.save();
     logger.info(`User logged out: ${req.user.email}`);
     res.status(200).json({ success: true, message: 'Logged out successfully' });
   } catch (err) { next(err); }
@@ -96,7 +96,6 @@ const logout = async (req, res, next) => {
 
 const getMe = async (req, res) => {
   const userData = req.user.toJSON();
-  userData._id = userData.id;
   res.status(200).json({ success: true, data: { user: userData } });
 };
 

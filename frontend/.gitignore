@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+#custom
+Team_Task_Manager_Assignment.docx
+VERCEL_SUPABASE_DEPLOYMENT.md
+backend/.env.example.postgresql
+
