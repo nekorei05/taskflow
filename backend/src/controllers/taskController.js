@@ -1,6 +1,8 @@
 const Task = require('../models/Task');
 const Project = require('../models/Project');
+const User = require('../models/User');
 const logger = require('../utils/logger');
+const { logActivity, statusLabel } = require('../utils/activityLogger');
 const {
   loadProjectById,
   assertProjectMember,
@@ -196,6 +198,14 @@ const createTask = async (req, res, next) => {
 
     logger.info(`Task created: "${title}" in project ${projectId} by ${req.user.email}`);
 
+    await logActivity({
+      projectId: project._id,
+      taskId: task._id,
+      actorId: req.user._id,
+      type: 'task_created',
+      message: `${req.user.name} created "${title}"`,
+    });
+
     const populated = await populateTask(Task.findById(task._id));
 
     res.status(201).json({
@@ -219,6 +229,9 @@ const updateTask = async (req, res, next) => {
     }
 
     const isAdmin = project.isAdmin(req.user._id);
+    const prevStatus = task.status;
+    const prevDue = task.dueDate ? task.dueDate.toISOString() : null;
+    const prevAssignee = task.assignedTo ? task.assignedTo.toString() : null;
 
     if (!isAdmin && !canMemberUpdateTask(task, req.user._id, req.body)) {
       const assigned = isTaskAssignee(task, req.user._id);
@@ -253,6 +266,46 @@ const updateTask = async (req, res, next) => {
 
     logger.info(`Task updated: ${task._id} by ${req.user.email}`);
 
+    if (req.body.status !== undefined && req.body.status !== prevStatus) {
+      await logActivity({
+        projectId: task.projectId,
+        taskId: task._id,
+        actorId: req.user._id,
+        type: 'status_changed',
+        message: `${req.user.name} moved "${task.title}" to ${statusLabel(task.status)}`,
+        meta: { from: prevStatus, to: task.status },
+      });
+    }
+    if (req.body.dueDate !== undefined) {
+      const nextDue = task.dueDate ? task.dueDate.toISOString() : null;
+      if (nextDue !== prevDue) {
+        await logActivity({
+          projectId: task.projectId,
+          taskId: task._id,
+          actorId: req.user._id,
+          type: 'due_date_updated',
+          message: `${req.user.name} updated due date on "${task.title}"`,
+          meta: { dueDate: task.dueDate },
+        });
+      }
+    }
+    if (isAdmin && req.body.assignedTo !== undefined) {
+      const nextAssignee = task.assignedTo ? task.assignedTo.toString() : null;
+      if (nextAssignee !== prevAssignee) {
+        const assignee = task.assignedTo ? await User.findById(task.assignedTo).select('name') : null;
+        await logActivity({
+          projectId: task.projectId,
+          taskId: task._id,
+          actorId: req.user._id,
+          type: 'task_assigned',
+          message: assignee
+            ? `${req.user.name} assigned "${task.title}" to ${assignee.name}`
+            : `${req.user.name} unassigned "${task.title}"`,
+          meta: { assigneeId: task.assignedTo },
+        });
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: 'Task updated successfully',
@@ -286,6 +339,18 @@ const assignTask = async (req, res, next) => {
 
     task.assignedTo = assignedTo || null;
     await task.save();
+
+    const assignee = assignedTo ? await User.findById(assignedTo).select('name') : null;
+    await logActivity({
+      projectId: task.projectId,
+      taskId: task._id,
+      actorId: req.user._id,
+      type: 'task_assigned',
+      message: assignee
+        ? `${req.user.name} assigned "${task.title}" to ${assignee.name}`
+        : `${req.user.name} unassigned "${task.title}"`,
+      meta: { assigneeId: assignedTo },
+    });
 
     const populated = await populateTask(Task.findById(task._id));
 

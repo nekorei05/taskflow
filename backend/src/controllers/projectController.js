@@ -1,6 +1,7 @@
 const Project = require('../models/Project');
 const Task = require('../models/Task');
 const User = require('../models/User');
+const Activity = require('../models/Activity');
 const logger = require('../utils/logger');
 const { toIdString } = require('../utils/memberId');
 
@@ -231,6 +232,21 @@ const getInviteCandidates = async (req, res, next) => {
   }
 };
 
+const getProjectActivity = async (req, res, next) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit, 10) || 30, 50);
+    const activities = await Activity.find({ projectId: req.project._id })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate('actorId', 'name email')
+      .lean();
+
+    res.status(200).json({ success: true, data: { activities } });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getProjectDashboard = async (req, res, next) => {
   try {
     const projectId = req.project._id;
@@ -318,5 +334,6 @@ module.exports = {
   removeMember,
   updateMemberRole,
   getInviteCandidates,
+  getProjectActivity,
   getProjectDashboard,
 };

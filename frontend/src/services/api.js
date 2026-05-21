@@ -65,8 +65,11 @@ class ApiService {
 
   // Tasks
   getTasks = (params = {}) => {
-    const q = new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([, v]) => v)));
-    return this.request('GET', `/tasks?${q}`);
+    const q = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter(([, v]) => v !== '' && v != null))
+    );
+    const qs = q.toString();
+    return this.request('GET', `/tasks${qs ? `?${qs}` : ''}`);
   };
   getTask = (id) => this.request('GET', `/tasks/${id}`);
   createTask = (body) => this.request('POST', '/tasks', body);
@@ -91,6 +94,8 @@ class ApiService {
   updateProject = (id, body) => this.request('PATCH', `/projects/${id}`, body);
   deleteProject = (id) => this.request('DELETE', `/projects/${id}`);
   getProjectDashboard = (id) => this.request('GET', `/projects/${id}/dashboard`);
+  getProjectActivity = (id, limit = 30) =>
+    this.request('GET', `/projects/${id}/activity?limit=${limit}`);
   getInviteCandidates = (id) => this.request('GET', `/projects/${id}/invite-candidates`);
   inviteProjectMember = (id, body) => this.request('POST', `/projects/${id}/members`, body);
   removeProjectMember = (id, userId) => this.request('DELETE', `/projects/${id}/members/${userId}`);

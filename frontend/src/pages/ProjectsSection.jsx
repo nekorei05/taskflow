@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useProject } from '../context/ProjectContext';
-import RoleGuide from '../components/RoleGuide';
 import toast from 'react-hot-toast';
 
 export default function ProjectsSection() {
@@ -87,13 +86,16 @@ export default function ProjectsSection() {
         <div>
           <h2>Projects</h2>
           <p className="subtitle">
-            Any logged-in user can create a project. Invite teammates who already have an account
-            (no email is sent).
+            Create a team space, then add people who already signed up. No emails are sent.
           </p>
         </div>
       </header>
 
-      <RoleGuide context="projects" />
+      <div className="role-guide glass role-guide-compact">
+        <p className="role-guide-lines">
+          Project admins invite members and manage the board. Members work on tasks assigned to them.
+        </p>
+      </div>
 
       <div className="filters-bar glass" style={{ marginBottom: 16 }}>
         <form onSubmit={handleCreate} className="form-row" style={{ width: '100%', gap: 12 }}>

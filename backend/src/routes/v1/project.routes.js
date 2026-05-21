@@ -10,6 +10,7 @@ const {
   removeMember,
   updateMemberRole,
   getInviteCandidates,
+  getProjectActivity,
   getProjectDashboard,
 } = require('../../controllers/projectController');
 const { protect } = require('../../middleware/auth');
@@ -29,6 +30,7 @@ router.get('/', getProjects);
 router.post('/', createProjectValidation, validate, createProject);
 
 router.get('/:id/dashboard', loadProject, getProjectDashboard);
+router.get('/:id/activity', loadProject, getProjectActivity);
 router.get('/:id/invite-candidates', loadProject, requireProjectAdmin, getInviteCandidates);
 router.get('/:id', loadProject, getProject);
 router.patch('/:id', loadProject, requireProjectAdmin, updateProjectValidation, validate, updateProject);
