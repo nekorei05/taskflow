@@ -18,7 +18,7 @@ Manage projects, assign tasks, track workflows, and collaborate through a modern
 
 
 <p align="center">
-  <img src="./docs/screenshots/logo_taskflow.png" alt="TaskFlow Kanban Board" width="1000"/>
+  <img src="./docs/screenshots/logo_taskflow.png" alt="TaskFlow Kanban Board" width="100"/>
 </p>
 
 <br/>
