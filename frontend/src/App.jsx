@@ -3,6 +3,11 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
+import StatsSection from './pages/StatsSection';
+import TasksSection from './pages/TasksSection';
+import ProjectsSection from './pages/ProjectsSection';
+import ActivitySection from './pages/ActivitySection';
+import AdminSection from './pages/AdminSection';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -13,7 +18,7 @@ function ProtectedRoute({ children }) {
 function PublicRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="loading-spinner full"><div className="spinner" /></div>;
-  return user ? <Navigate to="/dashboard" replace /> : children;
+  return user ? <Navigate to="/tasks" replace /> : children;
 }
 
 export default function App() {
@@ -25,9 +30,13 @@ export default function App() {
           <Route path="/" element={<PublicRoute><AuthPage /></PublicRoute>} />
           
           {/* Authenticated Application Page Routes */}
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/tasks" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/projects" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
+            <Route path="/dashboard" element={<StatsSection />} />
+            <Route path="/tasks" element={<TasksSection />} />
+            <Route path="/projects" element={<ProjectsSection />} />
+            <Route path="/activity" element={<ActivitySection />} />
+            <Route path="/admin" element={<AdminSection />} />
+          </Route>
           
           {/* Wildcard Fallback redirection */}
           <Route path="*" element={<Navigate to="/" replace />} />

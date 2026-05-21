@@ -152,7 +152,7 @@ export default function AuthPage() {
     try {
       const user = await login(loginEmail, loginPassword);
       toast.success(`Welcome back, ${user.name}!`);
-      navigate('/dashboard');
+      navigate('/tasks');
     } catch (err) { setError(err.message || 'Login failed'); }
     finally { setLoading(false); }
   };
@@ -162,7 +162,7 @@ export default function AuthPage() {
     try {
       const user = await register(regName, regEmail, regPassword);
       toast.success(`Welcome, ${user.name}!`);
-      navigate('/dashboard');
+      navigate('/tasks');
     } catch (err) {
       const msg = err.errors ? err.errors.map(e => e.message).join(', ') : (err.message || 'Registration failed');
       setError(msg);
@@ -208,11 +208,11 @@ export default function AuthPage() {
             <form onSubmit={handleRegister}>
               <div style={s.formGroup}>
                 <label style={s.label}>Full Name</label>
-                <input style={s.input} type="text" value={regName} onChange={e => setRegName(e.target.value)} placeholder="John Doe" required />
+                <input style={s.input} type="text" value={regName} onChange={e => setRegName(e.target.value)} placeholder="Akash Patil" required />
               </div>
               <div style={s.formGroup}>
                 <label style={s.label}>Email</label>
-                <input style={s.input} type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} placeholder="john@example.com" required />
+                <input style={s.input} type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} placeholder="akash@example.com" required />
               </div>
               <div style={s.formGroup}>
                 <label style={s.label}>Password</label>
@@ -230,7 +230,7 @@ export default function AuthPage() {
         <div style={s.right}>
           <div>
             <h2 style={s.rightHeading}>Manage tasks,<br />ship faster.</h2>
-            <p style={s.rightSub}>TaskFlow keeps your team aligned — assign tasks, track progress, and hit every deadline.</p>
+            <p style={s.rightSub}>TaskFlow keeps your team aligned - assign tasks, track progress and hit every deadline.</p>
             <MiniDashboard />
           </div>
           <p style={s.rightFooter}>© {new Date().getFullYear()} TaskFlow. Professional Task Management.</p>
