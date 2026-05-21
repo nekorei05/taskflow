@@ -2,7 +2,7 @@
 
 # TaskFlow 
 <h1 align="center">
-  <img src="./docs/screenshots/logo_taskflow.png" alt="TaskFlow Logo" width="45" style="vertical-align: middle; margin-right: 10px;" />
+  <img src="./docs/screenshots/taskflow_logo.png" width="55" valign="middle"/>
   TaskFlow
 </h1>
 
