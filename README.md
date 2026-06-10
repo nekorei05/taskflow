@@ -13,7 +13,7 @@ Manage projects, assign tasks, track workflows, and collaborate through a modern
 
 <br/>
 
-[Live Application](https://taskflow-frontend-rosy-seven.vercel.app) • [Demo Video](https://drive.google.com/file/d/1Xchih9mLz8Bw-9qVWasO8EUTZkAjaDPI/view?usp=sharing)
+[Live Application](https://taskflow-frontend-rosy-seven.vercel.app) 
 
 </div>
 
